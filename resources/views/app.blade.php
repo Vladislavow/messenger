@@ -16,14 +16,13 @@
 
 <body>
     <div id='app'>
-        <!-- <v-app app style="background-color:#263238">
-            <navbar></navbar>
-            <v-container style="margin-top:60px; margin-bottom:-60px; min-height:100%;">
-                <router-view>
-                </router-view>
-            </v-container>
-            <footerbar style="bottom:0;"></footerbar>
-        </v-app> -->
+
+        <!-- <v-app app style="background-color:#263238"> -->
+        <!-- <navbar></navbar> -->
+        <router-view>
+        </router-view>
+        <!-- <footerbar style="bottom:0;"></footerbar> -->
+        <!-- </v-app> -->
     </div>
 </body>
 <script src="{{ mix('js/app.js') }}"></script>
