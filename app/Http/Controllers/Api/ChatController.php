@@ -8,17 +8,25 @@ use App\Models\User;
 
 class ChatController extends Controller
 {
-    public function getChats(User $user)
+    public function getChats()
     {
-        $messages = array_unique(
-            array_column(
-                Message::where('sender', $user->id)
-                    ->get()
-                    ->toArray(),
-                'recipient'
-            )
+        /** @var User $user  */
+        $user = auth()->user();
+        $messagesWithUser = Message::where('sender', $user->id)
+            ->orWhere('recipient', $user->id)
+            ->orderBy('created_at')
+            ->get()
+            ->toArray();
+        $recived = array_column(
+            $messagesWithUser,
+            'recipient'
         );
-        $chats = User::whereIn('id', $messages)->get();
+        $sent = array_column(
+            $messagesWithUser,
+            'sender'
+        );
+        $messages = array_unique(array_merge($recived, $sent));
+        $chats = User::whereIn('id', $messages)->where('id', "!=", $user->id)->get();
         return response()->json($chats);
     }
 }

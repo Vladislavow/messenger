@@ -13,7 +13,7 @@ class StoreMessageRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +24,9 @@ class StoreMessageRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'sender' => 'required|exists:users,id',
+            'recipient' => 'required|exists:users,id',
+            'content' => 'required|string',
         ];
     }
 }

@@ -8,6 +8,7 @@ export default new Vuex.Store({
         status: '',
         token: localStorage.getItem('token') || '',
         user: {},
+        selectedChat:null,
     },
     mutations: {
         auth_request(state) {
@@ -28,7 +29,10 @@ export default new Vuex.Store({
         },
         set_user(state, value) {
             state.user = value;
-        },        
+        },
+        set_chat(state, value) {
+            state.selectedChat = value;
+        },    
     },
     actions: {
         login({ commit }, user) {
@@ -81,11 +85,23 @@ export default new Vuex.Store({
                 delete axios.defaults.headers.common['Authorization']
                 resolve()
             })
-        },        
+        },
+        getUser({commit}){
+            return new Promise((resolve, reject) => {
+                axios({ url: '/api/user', method: 'GET' }).then(resp =>{
+                    commit('set_user', resp.data)  
+                })                        
+                resolve()
+            })
+        },
+        selectChat({commit}, selectChat){
+            commit('set_chat',selectChat);
+        }
     },
     getters: {
         isLoggedIn: state => !!state.token,
         authStatus: state => state.status,
-        user: state => state.user,        
+        user: state => state.user,
+        selectedChat: state => state.selectedChat,
     }
 })

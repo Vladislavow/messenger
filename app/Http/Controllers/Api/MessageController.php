@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Events\NewMessage;
+use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
@@ -13,9 +15,18 @@ class MessageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(int $id)
     {
-        //
+        /** @var User $user */
+        $user = auth()->user();
+        $messages = Message::where(function ($query) use ($id, $user) {
+            $query->where('sender', $user->id);
+            $query->where('recipient', $id);
+        })->orWhere(function ($query) use ($id, $user) {
+            $query->where('recipient', $user->id);
+            $query->where('sender', $id);
+        })->get();
+        return response()->json($messages);
     }
 
     /**
@@ -23,9 +34,8 @@ class MessageController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(StoreMessageRequest $request)
     {
-        //
     }
 
     /**
@@ -36,7 +46,10 @@ class MessageController extends Controller
      */
     public function store(StoreMessageRequest $request)
     {
-        //
+        $validatedFields = $request->validated();
+        $message = Message::create($validatedFields);
+        broadcast(new NewMessage($message));
+        return response()->json($message);
     }
 
     /**

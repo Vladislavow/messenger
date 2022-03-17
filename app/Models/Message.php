@@ -14,4 +14,18 @@ class Message extends Model
         'recipient',
         'content',
     ];
+
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i'
+    ];
+
+    public function sender()
+    {
+        return $this->hasOne(User::class, 'id', 'sender');
+    }
+
+    public function recipient()
+    {
+        return $this->hasOne(User::class, 'id', 'recipient');
+    }
 }
