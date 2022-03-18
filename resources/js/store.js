@@ -9,6 +9,7 @@ export default new Vuex.Store({
         token: localStorage.getItem('token') || '',
         user: {},
         selectedChat:null,
+        chats:[]
     },
     mutations: {
         auth_request(state) {
@@ -30,9 +31,24 @@ export default new Vuex.Store({
         set_user(state, value) {
             state.user = value;
         },
+        set_chats(state, chats){
+          state.chats = chats;  
+        },
         set_chat(state, value) {
+            state.chats[
+                state.chats.indexOf(
+                    state.chats.find((chat) => chat.id == value)
+                )
+            ].unread = 0;
             state.selectedChat = value;
-        },    
+        },
+        set_unread(state, data){
+            state.chats[
+                state.chats.indexOf(
+                    state.chats.find((chat) => chat.id == data.sender)
+                )
+            ].unread += data.count;
+        }
     },
     actions: {
         login({ commit }, user) {
@@ -82,6 +98,7 @@ export default new Vuex.Store({
                 commit('logout')
                 localStorage.removeItem('userid')
                 localStorage.removeItem('token')
+                Echo.disconnect();
                 delete axios.defaults.headers.common['Authorization']
                 resolve()
             })
@@ -95,13 +112,26 @@ export default new Vuex.Store({
             })
         },
         selectChat({commit}, selectChat){
+
             commit('set_chat',selectChat);
+        },
+        getChats({commit}){
+            return new Promise((resolve, reject) => {
+            axios.get("/api/chats").then((resp) => {
+                commit('set_chats',resp.data)
+                resolve(resp)
+            });
+          });
+        },
+        setUnread({commit}, data){
+            commit('set_unread',data);
         }
     },
     getters: {
         isLoggedIn: state => !!state.token,
         authStatus: state => state.status,
         user: state => state.user,
+        chats: state=>state.chats,
         selectedChat: state => state.selectedChat,
     }
 })

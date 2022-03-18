@@ -6,7 +6,12 @@
         }"
     >
         {{ message.content }}
-        {{ message.created_at }}
+        <p class="time">{{ message.created_at }}</p>
+        <div class="read">
+            <v-icon v-if="userId != message.recipient">{{
+                message.read == true ? "mdi-check-all" : "mdi-check"
+            }}</v-icon>
+        </div>
     </div>
 </template>
 
@@ -20,15 +25,25 @@ export default {
 .message {
     display: inline-block;
     position: relative;
-    left: 63%;
+    /* left: 80%; */
     background: blue;
-    width: 35%;
+    max-width: 70%;
     border-radius: 15px;
     padding: 5px;
     margin: 10px;
+    text-align: right;
+    vertical-align: right;
+    align-self: flex-end;
 }
 .received {
+    align-self: flex-start;
+    text-align: left;
     left: 0;
     background: gold;
+}
+
+.time {
+    text-align: right;
+    font-size: 14px;
 }
 </style>

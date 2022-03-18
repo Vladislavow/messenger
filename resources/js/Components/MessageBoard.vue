@@ -1,6 +1,14 @@
 <template>
     <div class="board">
-        <message-list :messages="this.messages" :userId="userId" />
+        <message-list
+            :loading="this.loading"
+            :messages="this.messages"
+            :userId="userId"
+            :page="this.page"
+            :totalPages="this.totalPages"
+            @loaded="stopLoading"
+            @getMessages="getMessages"
+        />
         <message-creator @send="send" />
     </div>
 </template>
@@ -13,6 +21,9 @@ export default {
     data: () => {
         return {
             messages: [],
+            loading: false,
+            page: 1,
+            totalPages: 1,
         };
     },
     mounted() {
@@ -28,12 +39,24 @@ export default {
     methods: {
         getMessages() {
             axios
-                .get(`/api/chat/${this.chat}/messages`)
-                .then((resp) => [(this.messages = resp.data)]);
+                .get(`/api/chat/${this.chat}/messages?page=${this.page}`)
+                .then((resp) => {
+                    this.messages = resp.data.data
+                        .reverse()
+                        .concat(this.messages);
+                    this.totalPages = resp.data.last_page;
+                    this.page = this.page + 1;
+                });
         },
         handleIncoming(message) {
             if (this.chat == message.sender) {
                 this.messages.push(message);
+                this.setRead();
+            } else {
+                this.$store.dispatch("setUnread", {
+                    sender: message.sender,
+                    count: 1,
+                });
             }
         },
         send(text) {
@@ -47,13 +70,26 @@ export default {
                     this.messages.push(resp.data);
                 });
         },
+        stopLoading() {
+            this.loading = false;
+        },
+        setRead() {
+            this.messages.forEach((message) => {
+                if (message.sender == this.userId) {
+                    message.read = true;
+                }
+            });
+        },
     },
     computed: {
         chat: function () {
+            this.messages = [];
+            this.loading = true;
+            this.page = 1;
             return this.$store.getters.selectedChat;
         },
         userId: function () {
-            return localStorage.getItem("useerid");
+            return parseInt(localStorage.getItem("useerid"));
         },
     },
 };

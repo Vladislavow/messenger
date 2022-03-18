@@ -2,6 +2,14 @@
     <div>
         <div :class="{ selected: this.selected, chat }" @click="selectChat">
             <div class="title">{{ chat.firstname + " " + chat.lastname }}</div>
+            <div
+                :class="{
+                    unread: chat.unread > 0,
+                    'none-unread': chat.unread <= 0,
+                }"
+            >
+                {{ chat.unread }}
+            </div>
         </div>
     </div>
 </template>
@@ -25,11 +33,14 @@ export default {
 <style scoped>
 .chat {
     min-height: 60px;
-    border-radius: 10px;
-    margin: 5px;
+    /* border-radius: 10px; */
+    margin: 10px;
     width: 97%;
-    background: rgb(82, 77, 77);
+    background: rgb(33, 33, 33);
     left: 0;
+    display: flex;
+    border: 1px solid #ffff;
+    border-radius: 3px 24px 24px 24px;
 }
 
 .title {
@@ -40,5 +51,23 @@ export default {
 
 .selected {
     background: gold;
+}
+
+.unread {
+    background: red;
+    color: white;
+    border-radius: 50%;
+    font-size: 14px;
+    padding: 5px;
+    min-width: 25px;
+    min-height: 25px;
+    max-height: 25px;
+    max-width: 25px;
+    margin-left: 10px;
+    vertical-align: center;
+    text-align: center;
+}
+.none-unread {
+    display: none;
 }
 </style>

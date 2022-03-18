@@ -27,6 +27,7 @@
     "dependencies": {
         "laravel-echo": "^1.11.4",
         "pusher-js": "^7.0.6",
+        "vue-infinite-loading": "^2.4.5",
         "vue-router": "^3.5.3",
         "vuetify": "^2.6.4",
         "vuex": "^3.6.2"

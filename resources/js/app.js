@@ -16,6 +16,7 @@ import vuetify from './vuetify';
 import 'vuetify/dist/vuetify.min.css'
 import Axios from 'axios'
 import store from './store';
+import InfiniteLoading from 'vue-infinite-loading';
 
 const router = new VueRouter(routes);
 router.beforeEach((to, from, next) => {
@@ -38,6 +39,7 @@ const token = localStorage.getItem('token')
 if (token) {
   Vue.prototype.$http.defaults.headers.common['Authorization'] = `Bearer ${token}`
 }
+Vue.use(InfiniteLoading);
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 

@@ -23,6 +23,7 @@ export default {
     width: 25%;
     top: 0;
     left: 0;
-    background: red;
+    background: rgb(33, 33, 33);
+    border-bottom: 3px solid rgb(0, 0, 0);
 }
 </style>

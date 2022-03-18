@@ -19,13 +19,17 @@ class MessageController extends Controller
     {
         /** @var User $user */
         $user = auth()->user();
+        Message::where(function ($query) use ($id, $user) {
+            $query->where('sender', $id);
+            $query->where('recipient', $user->id);
+        })->where('read', false)->update(['read' => true]);
         $messages = Message::where(function ($query) use ($id, $user) {
             $query->where('sender', $user->id);
             $query->where('recipient', $id);
         })->orWhere(function ($query) use ($id, $user) {
             $query->where('recipient', $user->id);
             $query->where('sender', $id);
-        })->get();
+        })->orderBy('created_at', 'desc')->paginate(20);
         return response()->json($messages);
     }
 
@@ -47,7 +51,14 @@ class MessageController extends Controller
     public function store(StoreMessageRequest $request)
     {
         $validatedFields = $request->validated();
+        /** @var User $user */
+        $user = auth()->user();
+        Message::where(function ($query) use ($request, $user) {
+            $query->where('sender', $request->recipient);
+            $query->where('recipient', $user->id);
+        })->where('read', false)->update(['read' => true]);
         $message = Message::create($validatedFields);
+        $message->read = false;
         broadcast(new NewMessage($message));
         return response()->json($message);
     }

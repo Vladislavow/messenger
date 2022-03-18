@@ -5592,7 +5592,6 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     handleIncoming: function handleIncoming(message) {
-      console.log("hi");
 
       if (this.chat == message.sender) {
         this.messages.push(message);
