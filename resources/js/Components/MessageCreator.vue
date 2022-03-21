@@ -8,15 +8,24 @@
             clearable
             rows="2"
             rounded
+            dark
+            @keyup.enter="keysHandling"
         />
-        <v-btn fab dark @click="send">
-            <v-icon>mdi-send</v-icon>
+        <v-btn
+            :disabled="!this.content"
+            :loading="this.loading"
+            fab
+            dark
+            @click="send"
+        >
+            <v-icon color="white">mdi-send</v-icon>
         </v-btn>
     </div>
 </template>
 
 <script>
 export default {
+    props: ["loading"],
     data: () => {
         return {
             content: "",
@@ -29,6 +38,12 @@ export default {
                 this.content = "";
             }
         },
+        keysHandling(event) {
+            if (event.shiftKey === true && event.key === "Enter") {
+                return;
+            }
+            this.send();
+        },
     },
 };
 </script>
@@ -40,7 +55,10 @@ export default {
     height: 15%;
     bottom: 0;
     display: flex;
-    background: white;
+    background: rgb(33, 33, 33);
     padding: 10px;
+}
+.v-btn {
+    margin-left: 3px;
 }
 </style>

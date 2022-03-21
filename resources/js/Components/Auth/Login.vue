@@ -1,6 +1,6 @@
 <template>
     <div class="back">
-        <v-card color="red" class="login">
+        <v-card class="login">
             <v-text-field v-model="user.email" prepend-inner-icon="mdi-email" />
             <v-text-field
                 v-model="user.password"

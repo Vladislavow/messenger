@@ -15,7 +15,7 @@ class ChatController extends Controller
         $user = auth()->user();
         $messagesWithUser = Message::where('sender', $user->id)
             ->orWhere('recipient', $user->id)
-            ->orderBy('created_at')
+            ->orderBy('created_at', 'desc')
             ->get()
             ->toArray();
         $unreadChats = Message::where('recipient', $user->id)
@@ -32,12 +32,17 @@ class ChatController extends Controller
             'sender'
         );
         $messages = array_unique(array_merge($recived, $sent));
-        $chats = User::whereIn('id', $messages)->where('id', "!=", $user->id)->get();
+        $chats = User::whereIn('id', $messages)->where('id', "!=", $user->id)->orderBy('created_at', 'desc')->get();
         $chats = $chats->map(function ($chat) use ($unreadChats) {
             $contactUnread = $unreadChats->where('sender', $chat->id)->first();
             $chat->unread = $contactUnread ? $contactUnread->message_count : 0;
             return $chat;
         });
         return response()->json($chats);
+    }
+
+    public function getChat($id)
+    {
+        return User::find($id);
     }
 }

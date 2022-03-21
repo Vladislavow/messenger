@@ -1,6 +1,7 @@
 <template>
     <div class="board">
         <message-list
+            v-if="chat"
             :loading="this.loading"
             :messages="this.messages"
             :userId="userId"
@@ -9,34 +10,46 @@
             @loaded="stopLoading"
             @getMessages="getMessages"
         />
-        <message-creator @send="send" />
+        <message-creator v-if="chat" @send="send" :loading="this.loading" />
+        <profile />
     </div>
 </template>
 
 <script>
 import MessageCreator from "./MessageCreator.vue";
 import MessageList from "./MessageList.vue";
+import Profile from "./Profile.vue";
 export default {
-    components: { MessageList, MessageCreator },
+    components: { MessageList, MessageCreator, Profile },
     data: () => {
         return {
             messages: [],
-            loading: false,
             page: 1,
             totalPages: 1,
+            loading: false,
         };
     },
     mounted() {
         Echo.private(`messages.${this.userId}`).listen("NewMessage", (e) => {
             this.handleIncoming(e.message);
         });
+        Echo.private(`messages.${this.userId}`).listen("HasRead", (e) => {
+            this.marAsRead(e.chat);
+        });
     },
     watch: {
         chat: function (val) {
+            axios.post(`/api/chat/${val}/markasread`);
             this.getMessages();
         },
     },
     methods: {
+        marAsRead(chat) {
+            console.log("awd");
+            if (this.chat == chat) {
+                this.setRead();
+            }
+        },
         getMessages() {
             axios
                 .get(`/api/chat/${this.chat}/messages?page=${this.page}`)
@@ -49,9 +62,12 @@ export default {
                 });
         },
         handleIncoming(message) {
+            console.log(message.sender + " " + this.chat);
             if (this.chat == message.sender) {
                 this.messages.push(message);
                 this.setRead();
+                console.log("fckk");
+                axios.post(`/api/chat/${message.sender}/markasread`);
             } else {
                 this.$store.dispatch("setUnread", {
                     sender: message.sender,
@@ -60,6 +76,7 @@ export default {
             }
         },
         send(text) {
+            this.loading = true;
             axios
                 .post("/api/chats/messages", {
                     content: text,
@@ -68,6 +85,7 @@ export default {
                 })
                 .then((resp) => {
                     this.messages.push(resp.data);
+                    this.loading = false;
                 });
         },
         stopLoading() {
@@ -89,7 +107,7 @@ export default {
             return this.$store.getters.selectedChat;
         },
         userId: function () {
-            return parseInt(localStorage.getItem("useerid"));
+            return parseInt(localStorage.getItem("userid"));
         },
     },
 };

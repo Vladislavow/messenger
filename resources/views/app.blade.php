@@ -16,11 +16,13 @@
 
 <body>
     <div id='app'>
-
+        <v-app>
+            <router-view>
+            </router-view>
+        </v-app>
         <!-- <v-app app style="background-color:#263238"> -->
         <!-- <navbar></navbar> -->
-        <router-view>
-        </router-view>
+
         <!-- <footerbar style="bottom:0;"></footerbar> -->
         <!-- </v-app> -->
     </div>

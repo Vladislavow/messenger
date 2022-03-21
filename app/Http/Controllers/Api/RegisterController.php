@@ -13,6 +13,8 @@ class RegisterController extends Controller
     {
         $validatedFields = $request->validated();
         $user = User::create($validatedFields);
+        $avatar = $request->avatar->store('/', 'public');
+        $user->update(['avatar' => $avatar]);
         $token = $user->createToken($user->email)->plainTextToken;
         return response()->json([
             'user' => $user,

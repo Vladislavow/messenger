@@ -13,9 +13,6 @@ export default {
     data: () => {
         return {};
     },
-    watch: {
-        selected: function (val) {},
-    },
     methods: {
         getChatList() {
             this.$store.dispatch("getChats");
@@ -40,17 +37,30 @@ export default {
     position: fixed;
     width: 25%;
     background-color: rgb(33, 33, 33);
-    height: 92%;
+    top: 58px;
+
     bottom: 0;
     left: 0;
     overflow: scroll;
     overflow-x: hidden;
+    border-right: 1px solid black;
 }
 .chats::-webkit-scrollbar {
-    width: 3px;
+    width: 5px;
     border-radius: 100px;
 }
 .chats::-webkit-scrollbar-thumb {
     background-color: white;
+    display: none;
+    border-radius: 5px;
+}
+.chats::-webkit-scrollbar-thumb:hover {
+    display: initial;
+}
+
+@media (max-width: 700px) {
+    .chats {
+        width: 80px;
+    }
 }
 </style>

@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\MessageController;
 use Illuminate\Support\Facades\Route;
+use Symfony\Component\Mime\MessageConverter;
 
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', ['as' => 'login', LoginController::class, 'login'])->name('login');
@@ -16,4 +17,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/chats', [ChatController::class, 'getChats']);
     Route::get('/chat/{id}/messages', [MessageController::class, 'index']);
     Route::post('/chats/messages', [MessageController::class, 'store']);
+    Route::post('/chat/{id}/markasread', [MessageController::class, 'markAsRead']);
+    Route::get('/chat/{id}', [ChatController::class, 'getChat']);
 });

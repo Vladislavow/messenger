@@ -9,12 +9,13 @@
                 label="Lastname"
                 v-model="user.lastname"
             ></v-text-field>
-            <v-text-field label="Email" v-model="user.email"></v-text-field>
+            <v-text-field label="Phone" v-model="user.phone"></v-text-field>
             <v-text-field
                 label="Nickname"
                 v-model="user.nickname"
             ></v-text-field>
-            <v-text-field label="Phone" v-model="user.phone"></v-text-field>
+            <v-file-input v-model="user.avatar" />
+            <v-text-field label="Email" v-model="user.email"></v-text-field>
             <v-text-field
                 label="Password"
                 v-model="user.password"
@@ -41,6 +42,7 @@ export default {
                 nickname: "",
                 phone: "",
                 password: "",
+                avatar: undefined,
             },
             errors: {},
             show: false,
@@ -48,8 +50,17 @@ export default {
     },
     methods: {
         register() {
+            const config = { "content-type": "multipart/form-data" };
+            const formData = new FormData();
+            formData.append("firstname", this.user.firstname);
+            formData.append("lastname", this.user.lastname);
+            formData.append("email", this.user.email);
+            formData.append("nickname", this.user.nickname);
+            formData.append("phone", this.user.phone);
+            formData.append("password", this.user.password);
+            formData.append("avatar", this.user.avatar);
             this.$store
-                .dispatch("register", this.user)
+                .dispatch("register", { form: formData, config: config })
                 .then(() => {
                     this.$router.push("/");
                 })

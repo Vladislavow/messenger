@@ -32,7 +32,7 @@ router.beforeEach((to, from, next) => {
     } else {
       next()
     }
-  })
+  }) 
 Vue.use(VueRouter);
 Vue.prototype.$http = Axios;
 const token = localStorage.getItem('token')
@@ -44,7 +44,16 @@ Vue.use(InfiniteLoading);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
-
+Axios.interceptors.response.use((response) => {
+  return response;
+}, function (error) {
+  if (error.response.status === 401) {
+    localStorage.removeItem('token')
+    localStorage.removeItem('userid')
+    router.push('/')
+  }
+  return Promise.reject(error);
+});
 const app = new Vue({
     el: '#app',
     components: {App},

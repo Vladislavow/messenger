@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\HasRead;
 use App\Events\NewMessage;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
@@ -31,6 +32,17 @@ class MessageController extends Controller
             $query->where('sender', $id);
         })->orderBy('created_at', 'desc')->paginate(20);
         return response()->json($messages);
+    }
+
+    public function markAsRead($id)
+    {
+        /** @var User $user */
+        $user = auth()->user();
+        Message::where(function ($query) use ($id, $user) {
+            $query->where('sender', $id);
+            $query->where('recipient', $user->id);
+        })->where('read', false)->update(['read' => true]);
+        broadcast(new HasRead($id));
     }
 
     /**

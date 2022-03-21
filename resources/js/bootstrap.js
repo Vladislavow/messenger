@@ -35,3 +35,4 @@ window.Echo = new Echo({
         Authorization: `Bearer ${localStorage.getItem('token')}`
       }
 }});
+
