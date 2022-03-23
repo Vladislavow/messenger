@@ -16,7 +16,7 @@ class Message extends Model
     ];
 
     protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i'
+        'created_at' => 'datetime:Y-m-d H:i:s'
     ];
 
     public function sender()

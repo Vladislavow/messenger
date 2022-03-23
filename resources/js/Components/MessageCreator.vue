@@ -61,4 +61,9 @@ export default {
 .v-btn {
     margin-left: 3px;
 }
+@media (max-width: 700px) {
+    .creator {
+        width: 61%;
+    }
+}
 </style>

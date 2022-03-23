@@ -7,18 +7,24 @@
     >
         <div class="content">
             {{ message.content }}
-            <sub class="time">
-                {{
-                    ("0" + new Date(message.created_at).getHours()).slice(-2) +
-                    ":" +
-                    ("0" + new Date(message.created_at).getHours()).slice(-2)
-                }}
-            </sub>
-            <sub class="read">
-                <v-icon small v-if="userId != message.recipient">{{
-                    message.read == true ? "mdi-check-all" : "mdi-check"
-                }}</v-icon>
-            </sub>
+            <div class="statuses">
+                <span class="time">
+                    {{
+                        ("0" + new Date(message.created_at).getHours()).slice(
+                            -2
+                        ) +
+                        ":" +
+                        ("0" + new Date(message.created_at).getMinutes()).slice(
+                            -2
+                        )
+                    }}
+                </span>
+                <span class="read">
+                    <v-icon small v-if="userId != message.recipient">{{
+                        message.read == true ? "mdi-check-all" : "mdi-check"
+                    }}</v-icon>
+                </span>
+            </div>
         </div>
     </div>
 </template>
@@ -76,5 +82,17 @@ export default {
     pointer-events: none;
     border-bottom-color: rgb(6, 153, 13);
     border-width: 10px;
+}
+
+.statuses {
+    position: relative;
+    bottom: -3px;
+    float: right;
+    margin-left: 3px;
+    display: inline;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 </style>

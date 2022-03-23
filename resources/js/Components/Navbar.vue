@@ -1,18 +1,23 @@
 <template>
     <div class="navi">
         <div class="menu">
-            <v-menu offset-y bottom left>
+            <v-menu offset-y bottom transition="slide-y-transition">
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn large dark icon v-bind="attrs" v-on="on">
                         <v-icon>mdi-menu</v-icon>
                     </v-btn>
                 </template>
-                <v-list>
-                    <v-list-item @click="logout"> Log out </v-list-item>
+                <v-list dense shaped>
+                    <v-list-item @click="showProfile">
+                        <v-icon>mdi-account</v-icon>
+                        {{ " Profile" }}
+                    </v-list-item>
+                    <v-list-item @click="logout">
+                        <v-icon>mdi-logout</v-icon>{{ " Log out" }}
+                    </v-list-item>
                 </v-list>
             </v-menu>
         </div>
-
         <div class="search">
             <v-text-field
                 rounded
@@ -25,6 +30,10 @@
                 height="44px"
                 hide-details=""
                 dense
+                label="Search"
+                v-model="search"
+                @click:clear="stopSearch()"
+                @input="getIssues"
             ></v-text-field>
         </div>
     </div>
@@ -32,13 +41,54 @@
 
 <script>
 export default {
+    data: () => {
+        return {
+            search: "",
+            cancelToken: null,
+            source: null,
+        };
+    },
+    watch: {
+        search: function (value) {
+            if (value == "") {
+                this.$store.dispatch("setSearch", false);
+            }
+        },
+    },
     methods: {
         logout() {
             this.$store.dispatch("logout").then(() => {
                 this.$router.push("/login");
             });
         },
-        getIssues() {},
+        getIssues() {
+            if (this.source != null) {
+                this.source.cancel();
+            }
+            this.CancelToken = axios.CancelToken;
+            this.source = this.CancelToken.source();
+            if (this.search) {
+                axios
+                    .get("/api/chats?title=" + this.search, {
+                        cancelToken: this.source.token,
+                    })
+                    .then((response) => {
+                        this.$store.dispatch("setSearch", true);
+                        this.$store.dispatch("setSearchedChats", response.data);
+                    });
+            } else {
+                this.stopSearch();
+            }
+        },
+        showProfile() {
+            this.$store.dispatch(
+                "setSelectedProfile",
+                localStorage.getItem("userid")
+            );
+        },
+        stopSearch() {
+            this.$store.dispatch("setSearch", false);
+        },
     },
 };
 </script>
@@ -54,6 +104,7 @@ export default {
     border-bottom: 2px solid rgb(0, 0, 0);
     display: flex;
     min-height: 58px;
+    border-right: 1px solid black;
 }
 
 @media (max-width: 700px) {
@@ -64,6 +115,7 @@ export default {
 .search {
     margin-top: 2%;
     width: 90%;
+    margin-right: 5px;
 }
 .menu {
     margin-top: 2%;

@@ -2,7 +2,17 @@
     <div>
         <div :class="{ selected: this.selected, chat }" @click="selectChat">
             <img class="avatar" :src="chat.avatar" />
-            <div class="title">{{ chat.firstname + " " + chat.lastname }}</div>
+            <div class="content">
+                <div class="title">{{ getTitle() }}</div>
+                <div v-if="chat.last_message" class="lastMessage">
+                    {{ getLastMessage() }}
+                </div>
+            </div>
+            <div v-if="chat.last_message && myMessage()" class="my_unread">
+                <v-icon small color="white">{{
+                    chat.last_message.read ? "mdi-check-all" : "mdi-check"
+                }}</v-icon>
+            </div>
             <div
                 :class="{
                     unread: chat.unread > 0,
@@ -21,6 +31,20 @@ export default {
     methods: {
         selectChat() {
             this.$store.dispatch("selectChat", this.chat.id);
+        },
+        getLastMessage() {
+            return this.chat.last_message.content.length > 35
+                ? this.chat.last_message.content.substr(0, 35) + "..."
+                : this.chat.last_message.content;
+        },
+        getTitle() {
+            let name = this.chat.firstname + " " + this.chat.lastname;
+            return name.length > 17 ? name.substr(0, 17) + "..." : name;
+        },
+        myMessage() {
+            return (
+                this.chat.last_message.sender == localStorage.getItem("userid")
+            );
         },
     },
     computed: {
@@ -46,10 +70,12 @@ export default {
 
 .title {
     color: white;
-    margin-left: 15px;
     font-size: 22px;
 }
 
+.content {
+    margin-left: 15px;
+}
 @media (max-width: 700px) {
     .title {
         display: none;
@@ -94,5 +120,12 @@ export default {
     margin-top: 5px;
     margin-left: 5px;
     border-radius: 50%;
+}
+.lastMessage {
+    color: rgb(204, 197, 197);
+}
+.my_unread {
+    position: absolute;
+    right: 13px;
 }
 </style>

@@ -9,7 +9,10 @@ export default new Vuex.Store({
         token: localStorage.getItem('token') || '',
         user: {},
         selectedChat:null,
-        chats:[]
+        chats:[],
+        selectedProfile:null,
+        search:false,
+        searchedChats:null
     },
     mutations: {
         auth_request(state) {
@@ -35,11 +38,23 @@ export default new Vuex.Store({
           state.chats = chats;  
         },
         set_chat(state, value) {
-            state.chats[
+            var chat = state.chats[
                 state.chats.indexOf(
                     state.chats.find((chat) => chat.id == value)
                 )
-            ].unread = 0;
+            ];
+            if(state.search && !chat){
+                console.log('hi')
+               state.chats.unshift(state.searchedChats[
+                    state.searchedChats.indexOf(
+                        state.searchedChats.find((chat) => chat.id == value)
+                    )
+                ]);
+                state.search = false;
+                state.selectedChat = value;
+                return;
+            }
+            chat.unread = 0;
             state.selectedChat = value;
         },
         set_unread(state, data){
@@ -48,7 +63,23 @@ export default new Vuex.Store({
                     state.chats.find((chat) => chat.id == data.sender)
                 )
             ].unread += data.count;
-        }
+        },
+        set_last_message(state, data){
+            state.chats[
+                state.chats.indexOf(
+                    state.chats.find((chat) => chat.id == data.sender)
+                )
+            ].last_message = data.message;
+        },
+        set_selected_profile(state, value){
+            state.selectedProfile = value;
+        },
+        set_search(state, value){
+            state.search = value;
+        },
+        set_searched_chats(state, value){
+            state.searchedChats = value;
+        },
     },
     actions: {
         login({ commit }, user) {
@@ -113,7 +144,6 @@ export default new Vuex.Store({
             })
         },
         selectChat({commit}, selectChat){
-
             commit('set_chat',selectChat);
         },
         getChats({commit}){
@@ -126,7 +156,19 @@ export default new Vuex.Store({
         },
         setUnread({commit}, data){
             commit('set_unread',data);
-        }
+        },
+        setLastMessage({commit},data){
+            commit('set_last_message',data);
+        },
+        setSelectedProfile({commit}, value){
+            commit('set_selected_profile', value)
+        },
+        setSearch({commit}, value){
+            commit('set_search', value)
+        },
+        setSearchedChats({commit}, value){
+            commit('set_searched_chats', value)
+        },
     },
     getters: {
         isLoggedIn: state => !!state.token,
@@ -134,5 +176,13 @@ export default new Vuex.Store({
         user: state => state.user,
         chats: state=>state.chats,
         selectedChat: state => state.selectedChat,
+        selectedProfile: state => state.selectedProfile,
+        selectedChatInfo: state => state.chats[
+            state.chats.indexOf(
+                state.chats.find((chat) => chat.id == state.selectedChat)
+            )
+        ],
+        search: state => state.search,
+        searchedChats: state => state.searchedChats,
     }
 })

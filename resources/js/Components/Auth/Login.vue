@@ -1,10 +1,17 @@
 <template>
     <div class="back">
         <v-card class="login">
-            <v-text-field v-model="user.email" prepend-inner-icon="mdi-email" />
+            <v-text-field
+                v-model="user.email"
+                prepend-inner-icon="mdi-email"
+                :error="this.errors != null && this.errors.email != null"
+                :error-messages="this.errors.email"
+            />
             <v-text-field
                 v-model="user.password"
                 prepend-inner-icon="mdi-lock"
+                :error="this.errors != null && this.errors.password != null"
+                :error-messages="this.errors.password"
             />
             <v-btn dark @click.prevent="login"> Enter</v-btn>
             <router-link to="/register">
@@ -22,6 +29,7 @@ export default {
                 email: "awd@awd.awd",
                 password: "12345678",
             },
+            errors: {},
         };
     },
     methods: {
@@ -32,7 +40,7 @@ export default {
                     this.$router.push("/");
                 })
                 .catch((error) => {
-                    console.log(error);
+                    this.errors = error.response.data.errors;
                 });
         },
     },

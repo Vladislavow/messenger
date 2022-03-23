@@ -1,9 +1,3 @@
-/**
- * First we will load all of this project's JavaScript dependencies which
- * includes Vue and other libraries. It is a great starting point when
- * building robust, powerful web applications using Vue and Laravel.
- */
-
 require('./bootstrap');
 
 window.Vue = require('vue').default;
@@ -17,6 +11,8 @@ import 'vuetify/dist/vuetify.min.css'
 import Axios from 'axios'
 import store from './store';
 import InfiniteLoading from 'vue-infinite-loading';
+import Toast, { POSITION } from "vue-toastification";
+import "vue-toastification/dist/index.css";
 
 const router = new VueRouter(routes);
 router.beforeEach((to, from, next) => {
@@ -40,9 +36,6 @@ if (token) {
   Vue.prototype.$http.defaults.headers.common['Authorization'] = `Bearer ${token}`
 }
 Vue.use(InfiniteLoading);
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
-
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Axios.interceptors.response.use((response) => {
   return response;
@@ -53,6 +46,9 @@ Axios.interceptors.response.use((response) => {
     router.push('/')
   }
   return Promise.reject(error);
+});
+Vue.use(Toast,{
+  position: POSITION.BOTTOM_RIGHT
 });
 const app = new Vue({
     el: '#app',

@@ -1,6 +1,8 @@
 <template>
     <div class="board">
+        <message-nav :class="this.selectedProfile ? '' : 'closedProfile'" />
         <message-list
+            :class="this.selectedProfile ? '' : 'ms'"
             v-if="chat"
             :loading="this.loading"
             :messages="this.messages"
@@ -10,23 +12,31 @@
             @loaded="stopLoading"
             @getMessages="getMessages"
         />
-        <message-creator v-if="chat" @send="send" :loading="this.loading" />
-        <profile />
+        <message-creator
+            :class="this.selectedProfile ? '' : 'ms'"
+            v-if="chat"
+            @send="send"
+            :loading="this.loading"
+        />
+        <profile v-if="selectedProfile" />
     </div>
 </template>
 
 <script>
+import MessageNav from "./MessageNav.vue";
 import MessageCreator from "./MessageCreator.vue";
 import MessageList from "./MessageList.vue";
 import Profile from "./Profile.vue";
 export default {
-    components: { MessageList, MessageCreator, Profile },
+    components: { MessageList, MessageCreator, Profile, MessageNav },
     data: () => {
         return {
             messages: [],
             page: 1,
             totalPages: 1,
             loading: false,
+            cancelToken: null,
+            source: null,
         };
     },
     mounted() {
@@ -39,8 +49,8 @@ export default {
     },
     watch: {
         chat: function (val) {
-            axios.post(`/api/chat/${val}/markasread`);
             this.getMessages();
+            axios.post(`/api/chat/${val}/markasread`);
         },
     },
     methods: {
@@ -51,14 +61,29 @@ export default {
             }
         },
         getMessages() {
+            this.loading = true;
+            if (this.source != null) {
+                this.source.cancel();
+            }
+            this.CancelToken = axios.CancelToken;
+            this.source = this.CancelToken.source();
             axios
-                .get(`/api/chat/${this.chat}/messages?page=${this.page}`)
+                .get(`/api/chat/${this.chat}/messages?page=${this.page}`, {
+                    cancelToken: this.source.token,
+                })
                 .then((resp) => {
+                    if (this.page == 1) {
+                        this.messages = [];
+                    }
                     this.messages = resp.data.data
                         .reverse()
                         .concat(this.messages);
                     this.totalPages = resp.data.last_page;
                     this.page = this.page + 1;
+                    this.loading = false;
+                })
+                .catch((err) => {
+                    console.log(err);
                 });
         },
         handleIncoming(message) {
@@ -69,11 +94,16 @@ export default {
                 console.log("fckk");
                 axios.post(`/api/chat/${message.sender}/markasread`);
             } else {
+                this.$toast.info("New message!");
                 this.$store.dispatch("setUnread", {
                     sender: message.sender,
                     count: 1,
                 });
             }
+            this.$store.dispatch("setLastMessage", {
+                sender: message.sender,
+                message: message,
+            });
         },
         send(text) {
             this.loading = true;
@@ -86,6 +116,10 @@ export default {
                 .then((resp) => {
                     this.messages.push(resp.data);
                     this.loading = false;
+                    this.$store.dispatch("setLastMessage", {
+                        sender: resp.data.recipient,
+                        message: resp.data,
+                    });
                 });
         },
         stopLoading() {
@@ -109,6 +143,9 @@ export default {
         userId: function () {
             return parseInt(localStorage.getItem("userid"));
         },
+        selectedProfile: function () {
+            return this.$store.getters.selectedProfile;
+        },
     },
 };
 </script>
@@ -117,9 +154,21 @@ export default {
 .board {
     height: 100%;
     width: 75%;
-    background: black;
+    background: rgb(33, 33, 33);
     position: fixed;
     top: 0;
     right: 0;
+}
+.ms {
+    margin-left: 12.5%;
+}
+.closedProfile {
+    width: 100%;
+}
+@media (max-width: 700px) {
+    .board {
+        left: 14%;
+        right: 25%;
+    }
 }
 </style>

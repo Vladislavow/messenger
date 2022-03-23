@@ -12,6 +12,7 @@
             class="loadMore"
             v-if="messages.length > 0 && page < totalPages + 1"
             @click="getMessages"
+            :loading="loading"
             rounded
         >
             Load more
@@ -35,7 +36,7 @@ export default {
         };
     },
     components: { Message },
-    props: ["messages", "userId", "laoding", "page", "totalPages"],
+    props: ["messages", "userId", "loading", "page", "totalPages"],
     watch: {
         messages: function () {
             setTimeout(() => {
@@ -78,11 +79,8 @@ export default {
                 }
                 prev = key;
             }
-            // Получение ссылки на элемент
             let slide = this.$refs[`date-0`];
-            // Определение расстояния от начала страницы до нужного элемента
             let top = window.scrollY + slide.getBoundingClientRect().y;
-            // Перемотка
             window.scrollTo(0, top);
         },
     },
@@ -94,12 +92,13 @@ export default {
 .messages {
     position: fixed;
     width: 50%;
-    height: 85%;
+    height: 77%;
     background: rgb(33, 33, 33);
     overflow: scroll;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
+    top: 58px;
 }
 .loadMore {
     margin-top: 3px;
@@ -138,5 +137,10 @@ export default {
     -moz-user-select: none;
     -webkit-user-select: none;
     user-select: none;
+}
+@media (max-width: 700px) {
+    .messages {
+        width: 61%;
+    }
 }
 </style>

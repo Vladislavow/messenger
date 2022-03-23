@@ -5,12 +5,16 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ChatController extends Controller
 {
-    public function getChats()
+    public function getChats(Request $request)
     {
+        if ($request->title) {
+            return response()->json(User::search($request->title)->get());
+        }
         /** @var User $user  */
         $user = auth()->user();
         $messagesWithUser = Message::where('sender', $user->id)

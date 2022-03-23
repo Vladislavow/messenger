@@ -26,9 +26,24 @@ export default {
             return this.$store.getters.selectedChat;
         },
         chats: function () {
-            return this.$store.getters.chats;
+            if (this.$store.getters.search) {
+                return this.$store.getters.searchedChats;
+            }
+            var chats = this.$store.getters.chats;
+            return chats.sort(sortByDate);
+        },
+        serchedChats: function () {
+            return this.$store.getters.searchedChats;
         },
     },
+};
+var sortByDate = function (d1, d2) {
+    return !d1.last_message || !d2.last_message
+        ? 1
+        : new Date(d1.last_message.created_at) >
+          new Date(d2.last_message.created_at)
+        ? -1
+        : 1;
 };
 </script>
 
@@ -38,7 +53,6 @@ export default {
     width: 25%;
     background-color: rgb(33, 33, 33);
     top: 58px;
-
     bottom: 0;
     left: 0;
     overflow: scroll;
@@ -60,7 +74,8 @@ export default {
 
 @media (max-width: 700px) {
     .chats {
-        width: 80px;
+        min-width: 14%;
+        max-width: 14%;
     }
 }
 </style>

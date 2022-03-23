@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -38,6 +39,9 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    public $appends = [
+        'last_message'
+    ];
     /**
      * The attributes that should be cast.
      *
@@ -45,6 +49,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'birtdate' => 'date'
     ];
 
     public function getAvatarAttribute($value)
@@ -55,5 +60,30 @@ class User extends Authenticatable
     public function messages()
     {
         return $this->hasMany(Message::class, 'sender', 'id');
+    }
+
+    public function getLastMessageAttribute()
+    {
+        if (auth()->check()) {
+            /** @var User $user */
+            $user = auth()->user();
+            $id = $this->id;
+            if ($id != $user->id) {
+                return Message::where(function ($query) use ($id, $user) {
+                    $query->where('sender', $user->id);
+                    $query->where('recipient', $id);
+                })->orWhere(function ($query) use ($id, $user) {
+                    $query->where('recipient', $user->id);
+                    $query->where('sender', $id);
+                })->orderBy('created_at', 'desc')->first();
+            }
+        }
+    }
+
+    public function scopeSearch(Builder $builder, $value)
+    {
+        /** @var User $user */
+        $user = auth()->user();
+        return $builder->where('id', '!=', $user->id)->where('firstname',  "like", "%$value%");
     }
 }
