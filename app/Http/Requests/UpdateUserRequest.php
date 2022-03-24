@@ -4,7 +4,9 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterRequest extends FormRequest
+use function Symfony\Component\String\b;
+
+class UpdateUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,12 +28,11 @@ class RegisterRequest extends FormRequest
         return [
             'firstname' => 'required|string',
             'lastname' => 'required|string',
-            'nickname' => 'required|string|unique:users',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8',
+            'nickname' => 'required|string',
+            'email' => 'required|email',
             'phone' => 'required|string',
             'birthdate' => 'required|date',
-            'avatar' => 'mimes:jpeg,jpg,png,gif|required|max:10000'
+            'bio' => 'string|nullable'
         ];
     }
 }

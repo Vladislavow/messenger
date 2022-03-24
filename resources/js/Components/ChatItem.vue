@@ -1,7 +1,20 @@
 <template>
     <div>
         <div :class="{ selected: this.selected, chat }" @click="selectChat">
-            <img class="avatar" :src="chat.avatar" />
+            <v-img class="avatar" :src="chat.avatar">
+                <template v-slot:placeholder>
+                    <v-row
+                        class="fill-height ma-0"
+                        align="center"
+                        justify="center"
+                    >
+                        <v-progress-circular
+                            indeterminate
+                            color="grey lighten-5"
+                        ></v-progress-circular>
+                    </v-row>
+                </template>
+            </v-img>
             <div class="content">
                 <div class="title">{{ getTitle() }}</div>
                 <div v-if="chat.last_message" class="lastMessage">

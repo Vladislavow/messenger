@@ -5,6 +5,18 @@
                 mdi-close
             </v-icon>
         </div>
+        <div v-if="this.canUpdate" class="update-btn">
+            <v-icon @click.prevent="showUpdate" color="white" large>
+                mdi-account-edit-outline
+            </v-icon>
+        </div>
+        <input
+            type="file"
+            @change="updateAvatar"
+            ref="file"
+            style="display: none"
+            accept=".png, .jpg, .jpeg"
+        />
         <div class="img-container">
             <v-img
                 class="image"
@@ -12,13 +24,42 @@
                 max-height="40%"
                 max-width="40%"
             >
+                <template>
+                    <v-row
+                        class="fill-height ma-0"
+                        align="center"
+                        justify="center"
+                    >
+                        <v-icon
+                            v-if="canUpdate"
+                            @click.prevent="$refs.file.click()"
+                            large
+                            class="edit-avatar"
+                            color="white"
+                        >
+                            mdi-camera</v-icon
+                        >
+                    </v-row>
+                </template>
+                <template v-slot:placeholder>
+                    <v-row
+                        class="fill-height ma-0"
+                        align="center"
+                        justify="center"
+                    >
+                        <v-progress-circular
+                            indeterminate
+                            color="grey lighten-5"
+                        ></v-progress-circular>
+                    </v-row>
+                </template>
             </v-img>
         </div>
         <v-divider dark />
-        <div class="name">
+        <div v-if="!this.update" class="name">
             {{ chat.firstname + " " + chat.lastname }}
         </div>
-        <div class="information">
+        <div v-if="!this.update" class="information">
             <div><v-icon dark>mdi-at</v-icon>{{ " " + chat.nickname }}</div>
             <div>
                 <v-icon dark>mdi-email-outline</v-icon>{{ " " + chat.email }}
@@ -26,7 +67,7 @@
             <div>
                 <v-icon dark>mdi-phone-outline</v-icon>{{ " " + chat.phone }}
             </div>
-            <div v-if="chat.bio">
+            <div v-if="chat.birthdate">
                 <v-icon dark>mdi-cake-variant-outline</v-icon
                 >{{ " " + chat.birthdate }}
             </div>
@@ -34,6 +75,115 @@
                 <v-icon dark>mdi-information-outline</v-icon
                 >{{ " " + chat.bio }}
             </div>
+        </div>
+        <div v-if="this.update" class="update">
+            <v-text-field
+                prepend-icon="mdi-passport"
+                label="Firstname"
+                rounded
+                outlined
+                dark
+                v-model="chat.firstname"
+                :error="this.errors != null && this.errors.firstname != null"
+                :error-messages="this.errors.firstname"
+            >
+            </v-text-field>
+            <v-text-field
+                prepend-icon="mdi-passport  "
+                label="Lastname"
+                rounded
+                outlined
+                dark
+                v-model="chat.lastname"
+                :error="this.errors != null && this.errors.lastname != null"
+                :error-messages="this.errors.lastname"
+            >
+            </v-text-field>
+            <v-text-field
+                prepend-icon="mdi-at"
+                label="Nickname"
+                rounded
+                outlined
+                dark
+                v-model="chat.nickname"
+                :error="this.errors != null && this.errors.nickname != null"
+                :error-messages="this.errors.nickname"
+            >
+            </v-text-field>
+            <v-text-field
+                prepend-icon="mdi-email-outline"
+                label="Email"
+                rounded
+                outlined
+                dark
+                v-model="chat.email"
+                :error="this.errors != null && this.errors.email != null"
+                :error-messages="this.errors.email"
+            >
+            </v-text-field>
+            <v-text-field
+                prepend-icon="mdi-phone-outline"
+                label="Phone"
+                rounded
+                outlined
+                dark
+                v-model="chat.phone"
+                :error="this.errors != null && this.errors.phone != null"
+                :error-messages="this.errors.phone"
+            >
+            </v-text-field>
+            <div>
+                <v-menu
+                    ref="menu"
+                    v-model="menu"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                >
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-text-field
+                            rounded
+                            outlined
+                            dark
+                            v-model="chat.birthdate"
+                            label="Birthdate"
+                            v-bind="attrs"
+                            v-on="on"
+                            readonly
+                            prepend-icon="mdi-calendar"
+                            :error="errors != null && errors.birthdate != null"
+                            :error-messages="errors.birthdate"
+                        ></v-text-field>
+                    </template>
+                    <v-date-picker
+                        dark
+                        v-model="chat.birthdate"
+                        :active-picker.sync="activePicker"
+                        :max="
+                            new Date(
+                                Date.now() -
+                                    new Date().getTimezoneOffset() * 60000
+                            )
+                                .toISOString()
+                                .substr(0, 10)
+                        "
+                        min="1950-01-01"
+                        @change="save"
+                    ></v-date-picker>
+                </v-menu>
+            </div>
+            <v-textarea
+                prepend-icon="mdi-information-outline"
+                label="Bio"
+                rounded
+                outlined
+                dark
+                v-model="chat.bio"
+                rows="2"
+            >
+            </v-textarea>
+            <v-btn @click.prevent="updateUser">Save</v-btn>
+            <v-btn @click.prevent="closeUpdate">Close</v-btn>
         </div>
     </div>
 </template>
@@ -43,6 +193,13 @@ export default {
     data: () => {
         return {
             chat: {},
+            update: false,
+            show: false,
+            activePicker: null,
+            date: null,
+            menu: false,
+            newAvatar: null,
+            errors: {},
         };
     },
     watch: {
@@ -54,6 +211,9 @@ export default {
         this.getChat();
     },
     methods: {
+        save(date) {
+            this.$refs.menu.save(date);
+        },
         getChat() {
             axios.get("/api/chat/" + this.chatId).then((resp) => {
                 this.chat = resp.data;
@@ -62,10 +222,48 @@ export default {
         closeProfile() {
             this.$store.dispatch("setSelectedProfile", null);
         },
+        showUpdate() {
+            this.update = true;
+        },
+        closeUpdate() {
+            this.getChat();
+            this.$store.dispatch("getUser");
+            this.update = false;
+        },
+        updateUser() {
+            axios
+                .put("/api/user", this.chat)
+                .then((response) => {
+                    this.$toast.success(response.data);
+                    this.closeUpdate();
+                })
+                .catch((errors) => {
+                    if (errors.response.status == 422) {
+                        this.errors = errors.response.data.errors;
+                    }
+                });
+        },
+        updateAvatar(e) {
+            let avatar = e.target.files[0];
+            if (avatar) {
+                const config = { "content-type": "multipart/form-data" };
+                const formData = new FormData();
+                formData.append("avatar", avatar);
+                axios
+                    .post("/api/user/avatar", formData, config)
+                    .then((resp) => {
+                        this.closeUpdate();
+                        this.$toast.success(resp.data);
+                    });
+            }
+        },
     },
     computed: {
         chatId: function () {
             return this.$store.getters.selectedProfile;
+        },
+        canUpdate: function () {
+            return this.chatId == localStorage.getItem("userid");
         },
     },
 };
@@ -82,6 +280,20 @@ export default {
     right: 0;
     background: rgb(33, 33, 33);
     border-left: 1px solid black;
+    overflow: scroll;
+    overflow-x: hidden;
+}
+.profile::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 100px;
+}
+.profile::-webkit-scrollbar-thumb {
+    background-color: white;
+    display: none;
+    border-radius: 5px;
+}
+.profile::-webkit-scrollbar-thumb:hover {
+    display: initial;
 }
 .image {
     margin-left: 30%;
@@ -109,5 +321,19 @@ export default {
     position: absolute;
     left: 10px;
     top: 10px;
+}
+.update {
+    padding: 10px;
+}
+.update-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+}
+.edit-avatar {
+    display: none !important;
+}
+.image:hover .edit-avatar {
+    display: initial !important;
 }
 </style>

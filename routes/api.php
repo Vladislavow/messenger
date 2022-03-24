@@ -14,9 +14,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/user', function () {
         return auth()->user();
     });
+    Route::put('/user', [LoginController::class, 'updateUser']);
+    Route::post('/user/avatar', [LoginController::class, 'updateAvatar']);
+
     Route::get('/chats', [ChatController::class, 'getChats']);
     Route::get('/chat/{id}/messages', [MessageController::class, 'index']);
     Route::post('/chats/messages', [MessageController::class, 'store']);
     Route::post('/chat/{id}/markasread', [MessageController::class, 'markAsRead']);
     Route::get('/chat/{id}', [ChatController::class, 'getChat']);
+    Route::delete('/message/{message}', [MessageController::class, 'destroy']);
 });

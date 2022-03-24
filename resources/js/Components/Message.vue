@@ -4,6 +4,7 @@
             received: userId == message.recipient,
             message,
         }"
+        @contextmenu.prevent="show"
     >
         <div class="content">
             {{ message.content }}
@@ -26,12 +27,43 @@
                 </span>
             </div>
         </div>
+        <v-menu v-model="showMenu" :position-x="x" :position-y="y" offset-y>
+            <v-list>
+                <div @mouseleave="hide">
+                    <v-list-item @click="deleteMessage"> Delete </v-list-item>
+                </div>
+            </v-list>
+        </v-menu>
     </div>
 </template>
 
 <script>
 export default {
+    data: () => {
+        return {
+            showMenu: false,
+            x: 0,
+            y: 0,
+        };
+    },
     props: ["message", "userId"],
+    methods: {
+        show(e) {
+            e.preventDefault();
+            this.showMenu = false;
+            this.x = e.clientX;
+            this.y = e.clientY;
+            this.$nextTick(() => {
+                this.showMenu = true;
+            });
+        },
+        hide() {
+            this.showMenu = false;
+        },
+        deleteMessage() {
+            this.$emit("deleteMessage", this.message);
+        },
+    },
 };
 </script>
 

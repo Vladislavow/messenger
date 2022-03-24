@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -27,6 +28,8 @@ class User extends Authenticatable
         'nickname',
         'phone',
         'avatar',
+        'birthdate',
+        'bio',
     ];
 
     /**
@@ -49,8 +52,13 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'birtdate' => 'date'
+        'birthdate' => 'date:Y-m-d'
     ];
+
+    public function setPasswordAttribute($password)
+    {
+        $this->attributes['password'] = Hash::make($password);
+    }
 
     public function getAvatarAttribute($value)
     {
@@ -84,6 +92,11 @@ class User extends Authenticatable
     {
         /** @var User $user */
         $user = auth()->user();
-        return $builder->where('id', '!=', $user->id)->where('firstname',  "like", "%$value%");
+        return $builder->where('id', '!=', $user->id)
+            ->where('firstname',  "like", "%$value%")
+            ->orWhere('lastname',  "like", "%$value%")
+            ->orWhere('nickname',  "like", "%$value%")
+            ->orWhere('email',  "like", "%$value%")
+            ->orWhere('phone',  "like", "%$value%");
     }
 }

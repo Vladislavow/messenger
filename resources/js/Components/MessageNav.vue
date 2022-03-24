@@ -1,6 +1,15 @@
 <template>
     <div @click="showProfile()" class="navbar">
-        <img v-if="chat" class="avatar" :src="chat.avatar" />
+        <v-img v-if="chat" class="avatar" :src="chat.avatar">
+            <template v-slot:placeholder>
+                <v-row class="fill-height ma-0" align="center" justify="center">
+                    <v-progress-circular
+                        indeterminate
+                        color="grey lighten-5"
+                    ></v-progress-circular>
+                </v-row>
+            </template>
+        </v-img>
         <div v-if="chat" class="title">
             {{ chat.firstname + " " + chat.lastname }}
         </div>
@@ -37,10 +46,15 @@ export default {
     border-left: 1px solid balck;
     border-bottom: 2px solid black;
     display: flex;
+    cursor: pointer;
 }
 .avatar {
-    height: 50px;
-    width: 50px;
+    max-height: 50px;
+    max-width: 50px;
+    min-height: 50px;
+    min-width: 50px;
+    vertical-align: center;
+    margin-left: 5px;
     border-radius: 50%;
 }
 

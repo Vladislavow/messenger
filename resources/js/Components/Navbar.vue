@@ -34,7 +34,17 @@
                 v-model="search"
                 @click:clear="stopSearch()"
                 @input="getIssues"
-            ></v-text-field>
+                outlined
+            >
+                <template v-slot:append>
+                    <v-progress-circular
+                        v-if="loading"
+                        size="24"
+                        color="info"
+                        indeterminate
+                    ></v-progress-circular>
+                </template>
+            </v-text-field>
         </div>
     </div>
 </template>
@@ -46,12 +56,13 @@ export default {
             search: "",
             cancelToken: null,
             source: null,
+            loading: false,
         };
     },
     watch: {
         search: function (value) {
             if (value == "") {
-                this.$store.dispatch("setSearch", false);
+                this.stopSearch();
             }
         },
     },
@@ -62,6 +73,7 @@ export default {
             });
         },
         getIssues() {
+            this.loading = true;
             if (this.source != null) {
                 this.source.cancel();
             }
@@ -75,6 +87,7 @@ export default {
                     .then((response) => {
                         this.$store.dispatch("setSearch", true);
                         this.$store.dispatch("setSearchedChats", response.data);
+                        this.loading = false;
                     });
             } else {
                 this.stopSearch();
@@ -88,6 +101,7 @@ export default {
         },
         stopSearch() {
             this.$store.dispatch("setSearch", false);
+            this.loading = false;
         },
     },
 };

@@ -21,7 +21,12 @@
             <div v-if="checkDate(message.created_at, index)" class="date">
                 {{ dates.get(index) }}
             </div>
-            <message :message="message" :userId="userId" :key="index" />
+            <message
+                @deleteMessage="deleteMessage"
+                :message="message"
+                :userId="userId"
+                :key="index"
+            />
         </template>
     </div>
 </template>
@@ -38,7 +43,7 @@ export default {
     components: { Message },
     props: ["messages", "userId", "loading", "page", "totalPages"],
     watch: {
-        messages: function () {
+        messages: function (value) {
             setTimeout(() => {
                 if (this.scrollLock) {
                     this.scrollLock = false;
@@ -47,11 +52,13 @@ export default {
                 var container = document.getElementById("mes");
                 container.scrollTop =
                     container.scrollHeight - container.clientHeight;
-                this.$emit("loaded");
             }, 50);
         },
     },
     methods: {
+        deleteMessage(message) {
+            this.$emit("deleteMessage", message);
+        },
         getMessages() {
             this.scrollLock = true;
             this.$emit("getMessages");

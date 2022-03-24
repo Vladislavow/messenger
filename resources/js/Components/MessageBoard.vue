@@ -11,6 +11,7 @@
             :totalPages="this.totalPages"
             @loaded="stopLoading"
             @getMessages="getMessages"
+            @deleteMessage="deleteMessage"
         />
         <message-creator
             :class="this.selectedProfile ? '' : 'ms'"
@@ -19,6 +20,15 @@
             :loading="this.loading"
         />
         <profile v-if="selectedProfile" />
+        <v-progress-circular
+            v-if="loading"
+            :class="{ loadwp: this.selectedProfile, load: true }"
+            color="white"
+            size="50"
+            class="load"
+            indeterminate
+        >
+        </v-progress-circular>
     </div>
 </template>
 
@@ -46,6 +56,9 @@ export default {
         Echo.private(`messages.${this.userId}`).listen("HasRead", (e) => {
             this.marAsRead(e.chat);
         });
+        Echo.private(`messages.${this.userId}`).listen("ChatUpdated", (e) => {
+            this.$store.dispatch("updateChat", e.chat);
+        });
     },
     watch: {
         chat: function (val) {
@@ -59,6 +72,20 @@ export default {
             if (this.chat == chat) {
                 this.setRead();
             }
+        },
+        deleteMessage(message) {
+            axios.delete("/api/message/" + message.id).then((response) => {
+                let id = this.messages.indexOf(
+                    this.messages.find((messagef) => messagef.id == message.id)
+                );
+                this.messages.splice(id, 1);
+
+                let lastmessage = this.messages[this.messages.length - 1];
+                this.$store.dispatch("setLastMessage", {
+                    sender: this.chat,
+                    message: lastmessage,
+                });
+            });
         },
         getMessages() {
             this.loading = true;
@@ -87,7 +114,6 @@ export default {
                 });
         },
         handleIncoming(message) {
-            console.log(message.sender + " " + this.chat);
             if (this.chat == message.sender) {
                 this.messages.push(message);
                 this.setRead();
@@ -95,10 +121,7 @@ export default {
                 axios.post(`/api/chat/${message.sender}/markasread`);
             } else {
                 this.$toast.info("New message!");
-                this.$store.dispatch("setUnread", {
-                    sender: message.sender,
-                    count: 1,
-                });
+                this.$store.dispatch("checkForChatExists", message);
             }
             this.$store.dispatch("setLastMessage", {
                 sender: message.sender,
@@ -136,7 +159,6 @@ export default {
     computed: {
         chat: function () {
             this.messages = [];
-            this.loading = true;
             this.page = 1;
             return this.$store.getters.selectedChat;
         },
@@ -164,6 +186,14 @@ export default {
 }
 .closedProfile {
     width: 100%;
+}
+.load {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+}
+.loadwp {
+    left: 35%;
 }
 @media (max-width: 700px) {
     .board {

@@ -1,14 +1,16 @@
 <template>
     <div class="back">
-        <v-card elevation="8" rounded="" class="register">
+        <div elevation="8" rounded="" class="register">
             <v-text-field
                 label="Firstname"
                 v-model="user.firstname"
                 prepend-icon="mdi-passport"
                 :error="this.errors != null && this.errors.firstname != null"
                 :error-messages="this.errors.firstname"
+                dark
             ></v-text-field>
             <v-text-field
+                dark
                 label="Lastname"
                 v-model="user.lastname"
                 prepend-icon="mdi-passport"
@@ -16,6 +18,7 @@
                 :error-messages="this.errors.lastname"
             ></v-text-field>
             <v-text-field
+                dark
                 label="Phone"
                 prepend-icon="mdi-phone"
                 v-model="user.phone"
@@ -23,6 +26,7 @@
                 :error-messages="this.errors.phone"
             ></v-text-field>
             <v-text-field
+                dark
                 label="Nickname"
                 v-model="user.nickname"
                 prepend-icon="mdi-at"
@@ -30,6 +34,7 @@
                 :error-messages="this.errors.nickname"
             ></v-text-field>
             <v-file-input
+                dark
                 label="Avatar"
                 v-model="user.avatar"
                 :error="this.errors != null && this.errors.avatar != null"
@@ -45,6 +50,7 @@
                 >
                     <template v-slot:activator="{ on, attrs }">
                         <v-text-field
+                            dark
                             v-model="user.birthdate"
                             label="Birthdate"
                             v-bind="attrs"
@@ -56,6 +62,7 @@
                         ></v-text-field>
                     </template>
                     <v-date-picker
+                        dark
                         v-model="user.birthdate"
                         :active-picker.sync="activePicker"
                         :max="
@@ -72,13 +79,18 @@
                 </v-menu>
             </div>
             <v-text-field
+                dark
                 prepend-icon="mdi-email"
                 label="Email"
                 v-model="user.email"
                 :error="this.errors != null && this.errors.email != null"
                 :error-messages="this.errors.email"
-            ></v-text-field>
+                readonly
+                onfocus="this.removeAttribute('readonly')"
+            >
+            </v-text-field>
             <v-text-field
+                dark
                 label="Password"
                 v-model="user.password"
                 :type="show ? 'text' : 'password'"
@@ -87,6 +99,7 @@
                 prepend-icon="mdi-lock"
                 :error="this.errors != null && this.errors.password != null"
                 :error-messages="this.errors.password"
+                autocomplete="new--password"
             ></v-text-field>
             <div class="btns">
                 <v-btn @click.prevent="register">Create account</v-btn>
@@ -94,7 +107,7 @@
                     <v-btn> Sign in</v-btn>
                 </router-link>
             </div>
-        </v-card>
+        </div>
     </div>
 </template>
 
@@ -158,17 +171,20 @@ export default {
     min-height: 200px;
     max-height: 630px;
     max-width: 500px;
-    /* background: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.24);
     border-radius: 16px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(6.1px);
     -webkit-backdrop-filter: blur(6.1px);
-    border: 1px solid rgba(255, 255, 255, 0.41); */
+    border: 1px solid rgba(255, 255, 255, 0.41);
 }
 .back {
+    background-image: url("https://web.telegram.org/k/assets/img/pattern.svg");
+    background-size: cover;
+    background-color: rgb(33, 33, 33);
+    background-attachment: fixed;
     display: flex;
     justify-content: center;
-    background: black;
     bottom: 0;
     height: 100%;
     padding: 50px;

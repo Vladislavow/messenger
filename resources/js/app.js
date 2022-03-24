@@ -37,6 +37,9 @@ if (token) {
 }
 Vue.use(InfiniteLoading);
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+Vue.use(Toast,{
+  position: POSITION.BOTTOM_RIGHT
+});
 Axios.interceptors.response.use((response) => {
   return response;
 }, function (error) {
@@ -44,12 +47,14 @@ Axios.interceptors.response.use((response) => {
     localStorage.removeItem('token')
     localStorage.removeItem('userid')
     router.push('/')
+  }else if(error.response.status ==422){
+    Vue.$toast.error('Unprocessible content');
+  }else{
+    Vue.$toast.error(error.response.data);
   }
   return Promise.reject(error);
 });
-Vue.use(Toast,{
-  position: POSITION.BOTTOM_RIGHT
-});
+
 const app = new Vue({
     el: '#app',
     components: {App},
