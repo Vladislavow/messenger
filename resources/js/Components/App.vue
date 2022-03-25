@@ -16,12 +16,7 @@ export default {
         return {};
     },
     methods: {},
-    created() {
-        if (Object.keys(this.$store.getters.user).length == 0) {
-            this.$store.dispatch("getUser");
-        } else {
-        }
-    },
+    created() {},
 };
 </script>
 

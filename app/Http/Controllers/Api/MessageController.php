@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Events\HasRead;
+use App\Events\MessageDeleted;
 use App\Events\NewMessage;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
@@ -118,6 +119,7 @@ class MessageController extends Controller
     public function destroy(Message $message)
     {
         $message->delete();
+        broadcast(new MessageDeleted($message));
         return response()->json('deleted', 200);
     }
 }

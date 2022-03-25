@@ -117,6 +117,10 @@ export default {
     vertical-align: center;
     text-align: center;
     left: 0;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 .none-unread {
     display: none;

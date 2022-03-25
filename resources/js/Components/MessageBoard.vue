@@ -34,6 +34,7 @@
 
 <script>
 import MessageNav from "./MessageNav.vue";
+import Echo from "laravel-echo";
 import MessageCreator from "./MessageCreator.vue";
 import MessageList from "./MessageList.vue";
 import Profile from "./Profile.vue";
@@ -47,30 +48,61 @@ export default {
             loading: false,
             cancelToken: null,
             source: null,
+            Echo: null,
         };
     },
+    destroyed() {
+        this.Echo.disconnect();
+    },
     mounted() {
-        Echo.private(`messages.${this.userId}`).listen("NewMessage", (e) => {
-            this.handleIncoming(e.message);
+        this.Echo = new Echo({
+            broadcaster: "pusher",
+            key: process.env.MIX_PUSHER_APP_KEY,
+            cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+            encrypted: true,
+            authEndpoint: `/api/broadcasting/auth`,
+            auth: {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            },
         });
-        Echo.private(`messages.${this.userId}`).listen("HasRead", (e) => {
-            this.marAsRead(e.chat);
-        });
-        Echo.private(`messages.${this.userId}`).listen("ChatUpdated", (e) => {
-            this.$store.dispatch("updateChat", e.chat);
-        });
+        this.$store
+            .dispatch("getUser")
+            .then((response) => {
+                this.Echo.private(`messages.${response.data.id}`)
+                    .listen("NewMessage", (e) => {
+                        this.handleIncoming(e.message);
+                    })
+                    .listen("HasRead", (e) => {
+                        this.marAsRead(e.chat);
+                    })
+                    .listen("ChatUpdated", (e) => {
+                        this.$store.dispatch("updateChat", e.chat);
+                    })
+                    .listen("MessageDeleted", (e) => {
+                        this.handleDeleted(e.message);
+                    });
+            })
+            .catch((err) => {
+                // this.$store.dispatch("logout");
+                // this.$router.push("/");
+            });
     },
     watch: {
         chat: function (val) {
-            this.getMessages();
-            axios.post(`/api/chat/${val}/markasread`);
+            if (val) {
+                this.getMessages();
+                axios.post(`/api/chat/${val}/markasread`);
+            }
         },
     },
     methods: {
         marAsRead(chat) {
-            console.log("awd");
             if (this.chat == chat) {
                 this.setRead();
+            } else {
+                this.$store.dispatch("setLastMessageAsRead", chat);
             }
         },
         deleteMessage(message) {
@@ -86,6 +118,19 @@ export default {
                     message: lastmessage,
                 });
             });
+        },
+        handleDeleted(message) {
+            if (this.chat == message.sender) {
+                let id = this.messages.indexOf(
+                    this.messages.find((messagef) => messagef.id == message.id)
+                );
+                this.messages.splice(id, 1);
+                let lastmessage = this.messages[this.messages.length - 1];
+                this.$store.dispatch("setLastMessage", {
+                    sender: this.chat,
+                    message: lastmessage,
+                });
+            }
         },
         getMessages() {
             this.loading = true;
@@ -109,20 +154,22 @@ export default {
                     this.page = this.page + 1;
                     this.loading = false;
                 })
-                .catch((err) => {
-                    console.log(err);
-                });
+                .catch((err) => {});
         },
         handleIncoming(message) {
             if (this.chat == message.sender) {
                 this.messages.push(message);
                 this.setRead();
-                console.log("fckk");
                 axios.post(`/api/chat/${message.sender}/markasread`);
+                this.setLastMessage(message);
             } else {
                 this.$toast.info("New message!");
-                this.$store.dispatch("checkForChatExists", message);
+                this.$store.dispatch("checkForChatExists", message).then(() => {
+                    this.setLastMessage(message);
+                });
             }
+        },
+        setLastMessage(message) {
             this.$store.dispatch("setLastMessage", {
                 sender: message.sender,
                 message: message,

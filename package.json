@@ -26,8 +26,10 @@
     },
     "dependencies": {
         "laravel-echo": "^1.11.4",
+        "moment-timezone": "^0.5.34",
         "pusher-js": "^7.0.6",
         "vue-infinite-loading": "^2.4.5",
+        "vue-moment": "^4.1.0",
         "vue-router": "^3.5.3",
         "vue-toastification": "^1.7.14",
         "vuetify": "^2.6.4",

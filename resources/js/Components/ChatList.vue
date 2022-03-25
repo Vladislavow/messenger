@@ -3,6 +3,13 @@
         <div v-for="(chat, index) in chats" :key="index">
             <chat-item :chat="chat" />
         </div>
+        <div v-if="this.chats.length == 0" class="empty">
+            {{
+                this.$store.getters.search
+                    ? "No results..."
+                    : "No chats started yet"
+            }}
+        </div>
     </div>
 </template>
 
@@ -77,5 +84,11 @@ var sortByDate = function (d1, d2) {
         min-width: 14%;
         max-width: 14%;
     }
+}
+.empty {
+    color: white;
+    text-align: center;
+    font-size: 24px;
+    margin-top: 10px;
 }
 </style>

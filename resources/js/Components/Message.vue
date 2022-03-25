@@ -11,6 +11,10 @@
             <div class="statuses">
                 <span class="time">
                     {{
+                        message.created_at
+                            | moment("timezone", "Europe/Kiev", "hh:mm")
+                    }}
+                    <!-- {{
                         ("0" + new Date(message.created_at).getHours()).slice(
                             -2
                         ) +
@@ -18,7 +22,7 @@
                         ("0" + new Date(message.created_at).getMinutes()).slice(
                             -2
                         )
-                    }}
+                    }} -->
                 </span>
                 <span class="read">
                     <v-icon small v-if="userId != message.recipient">{{
@@ -50,12 +54,14 @@ export default {
     methods: {
         show(e) {
             e.preventDefault();
-            this.showMenu = false;
-            this.x = e.clientX;
-            this.y = e.clientY;
-            this.$nextTick(() => {
-                this.showMenu = true;
-            });
+            if (this.message.sender == localStorage.getItem("userid")) {
+                this.showMenu = false;
+                this.x = e.clientX;
+                this.y = e.clientY;
+                this.$nextTick(() => {
+                    this.showMenu = true;
+                });
+            }
         },
         hide() {
             this.showMenu = false;
@@ -101,6 +107,10 @@ export default {
     position: inline;
     justify-self: right;
     font-size: 14px;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
 
 .message::after {

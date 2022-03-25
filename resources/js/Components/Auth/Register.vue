@@ -47,6 +47,7 @@
                     transition="scale-transition"
                     offset-y
                     min-width="auto"
+                    :close-on-content-click="false"
                 >
                     <template v-slot:activator="{ on, attrs }">
                         <v-text-field
@@ -90,6 +91,8 @@
             >
             </v-text-field>
             <v-text-field
+                readonly
+                onfocus="this.removeAttribute('readonly')"
                 dark
                 label="Password"
                 v-model="user.password"
@@ -150,7 +153,6 @@ export default {
                     this.$router.push("/");
                 })
                 .catch((error) => {
-                    console.log(error);
                     this.errors = error.response.data.errors;
                 });
         },

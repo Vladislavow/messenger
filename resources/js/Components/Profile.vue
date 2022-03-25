@@ -6,8 +6,8 @@
             </v-icon>
         </div>
         <div v-if="this.canUpdate" class="update-btn">
-            <v-icon @click.prevent="showUpdate" color="white" large>
-                mdi-account-edit-outline
+            <v-icon @click.prevent="switchUpdate" color="white" large>
+                {{ !update ? "mdi-account-edit-outline" : "mdi-account-edit" }}
             </v-icon>
         </div>
         <input
@@ -139,6 +139,7 @@
                     transition="scale-transition"
                     offset-y
                     min-width="auto"
+                    :close-on-content-click="false"
                 >
                     <template v-slot:activator="{ on, attrs }">
                         <v-text-field
@@ -182,8 +183,18 @@
                 rows="2"
             >
             </v-textarea>
-            <v-btn @click.prevent="updateUser">Save</v-btn>
-            <v-btn @click.prevent="closeUpdate">Close</v-btn>
+            <div class="buttons">
+                <v-btn
+                    color="green"
+                    dark
+                    class="save"
+                    @click.prevent="updateUser"
+                    >Save<v-icon color="white">mdi-content-save</v-icon>
+                </v-btn>
+                <v-btn color="red" @click.prevent="closeUpdate"
+                    >Close <v-icon>close</v-icon></v-btn
+                >
+            </div>
         </div>
     </div>
 </template>
@@ -255,6 +266,13 @@ export default {
                         this.closeUpdate();
                         this.$toast.success(resp.data);
                     });
+            }
+        },
+        switchUpdate() {
+            if (this.update) {
+                this.closeUpdate();
+            } else {
+                this.showUpdate();
             }
         },
     },
@@ -335,5 +353,12 @@ export default {
 }
 .image:hover .edit-avatar {
     display: initial !important;
+}
+.buttons {
+    display: flex;
+    justify-content: center;
+}
+.save {
+    margin-right: 10px;
 }
 </style>

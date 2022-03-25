@@ -38,27 +38,32 @@ export default new Vuex.Store({
             state.chats = chats;
         },
         set_chat(state, value) {
-            var chat =
-                state.chats[
-                    state.chats.indexOf(
-                        state.chats.find((chat) => chat.id == value)
-                    )
-                ];
-            if (state.search && !chat) {
-                console.log("hi");
-                state.chats.unshift(
-                    state.searchedChats[
-                        state.searchedChats.indexOf(
-                            state.searchedChats.find((chat) => chat.id == value)
+            if (state.selectedChat == null || state.selectedChat != value) {
+                var chat =
+                    state.chats[
+                        state.chats.indexOf(
+                            state.chats.find((chat) => chat.id == value)
                         )
-                    ]
-                );
-                state.search = false;
+                    ];
+                if (state.search && !chat) {
+                    state.chats.push(
+                        state.searchedChats[
+                            state.searchedChats.indexOf(
+                                state.searchedChats.find(
+                                    (schat) => schat.id == value
+                                )
+                            )
+                        ]
+                    );
+                    state.search = false;
+                    state.selectedChat = value;
+                    return;
+                }
+                chat.unread = 0;
                 state.selectedChat = value;
-                return;
+            } else {
+                state.selectedChat = null;
             }
-            chat.unread = 0;
-            state.selectedChat = value;
         },
         set_unread(state, data) {
             state.chats[
@@ -88,11 +93,15 @@ export default new Vuex.Store({
                 chat.unread = 1;
                 state.chats.push(chat);
             } else {
-                state.chats[
-                    state.chats.indexOf(
-                        state.chats.find((chat_a) => chat_a.id == chat.id)
-                    )
-                ].unread += 1;
+                let selected_chat =
+                    state.chats[
+                        state.chats.indexOf(
+                            state.chats.find((chat_a) => chat_a.id == chat.id)
+                        )
+                    ];
+                selected_chat.unread = selected_chat.unread
+                    ? selected_chat.unread + 1
+                    : 1;
             }
         },
         update_chat(state, chat) {
@@ -105,6 +114,13 @@ export default new Vuex.Store({
                 1
             );
             state.chats.push(chat);
+        },
+        set_last_message_as_read(state, chat) {
+            state.chats[
+                state.chats.indexOf(
+                    state.chats.find((schat) => schat.id == chat)
+                )
+            ].last_message.read = true;
         },
     },
     actions: {
@@ -161,7 +177,6 @@ export default new Vuex.Store({
                 commit("logout");
                 localStorage.removeItem("userid");
                 localStorage.removeItem("token");
-                Echo.disconnect();
                 delete axios.defaults.headers.common["Authorization"];
                 resolve();
             });
@@ -170,8 +185,10 @@ export default new Vuex.Store({
             return new Promise((resolve, reject) => {
                 axios({ url: "/api/user", method: "GET" }).then((resp) => {
                     commit("set_user", resp.data);
+                    resolve(resp);
                 });
-                resolve();
+            }).catch((err) => {
+                reject(err);
             });
         },
         selectChat({ commit }, selectChat) {
@@ -201,14 +218,20 @@ export default new Vuex.Store({
             commit("set_searched_chats", value);
         },
         checkForChatExists({ commit }, message) {
-            axios.get("/api/chat/" + message.sender).then((response) => {
-                commit("check_exists", response.data);
+            return new Promise((resolve, reject) => {
+                axios.get("/api/chat/" + message.sender).then((response) => {
+                    commit("check_exists", response.data);
+                    resolve();
+                });
             });
         },
         updateChat({ commit }, chat) {
             axios.get("/api/chat/" + chat.id).then((response) => {
                 commit("update_chat", response.data);
             });
+        },
+        setLastMessageAsRead({ commit }, chat) {
+            commit("set_last_message_as_read", chat);
         },
     },
     getters: {

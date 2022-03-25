@@ -5,16 +5,24 @@
                 dark
                 v-model="user.email"
                 prepend-inner-icon="mdi-email"
+                label="Email"
                 :error="this.errors != null && this.errors.email != null"
                 :error-messages="this.errors.email"
+                readonly
+                onfocus="this.removeAttribute('readonly')"
             />
             <v-text-field
                 dark
+                label="Password"
                 v-model="user.password"
                 prepend-inner-icon="mdi-lock"
                 :error="this.errors != null && this.errors.password != null"
-                type="password"
+                :type="show ? 'text' : 'password'"
                 :error-messages="this.errors.password"
+                :append-icon="this.show ? 'mdi-eye' : 'mdi-eye-off'"
+                @click:append="show = !show"
+                readonly
+                onfocus="this.removeAttribute('readonly')"
             />
             <v-btn dark @click.prevent="login" :loading="loading"> Enter</v-btn>
             <router-link to="/register">
@@ -29,11 +37,12 @@ export default {
     data: () => {
         return {
             user: {
-                email: "awd@awd.awd",
-                password: "12345678",
+                email: "",
+                password: "",
             },
             errors: {},
             loading: false,
+            show: false,
         };
     },
     methods: {
