@@ -58,7 +58,7 @@ Axios.interceptors.response.use(
         if (error.response.status === 401) {
             localStorage.removeItem("token");
             localStorage.removeItem("userid");
-            router.push("/");
+            location.reload();
         } else if (error.response.status == 422) {
             Vue.$toast.error("Unprocessible content");
         } else {

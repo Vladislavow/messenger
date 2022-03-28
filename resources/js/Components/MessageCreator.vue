@@ -1,41 +1,84 @@
 <template>
-    <div class="creator">
-        <v-textarea
-            no-resize
-            filled
-            placeholder="Message here"
-            v-model="content"
-            clearable
-            rows="2"
-            rounded
-            dark
-            @keyup.enter="keysHandling"
-        />
-        <v-btn
-            :disabled="!this.content"
-            :loading="this.loading"
-            fab
-            dark
-            @click="send"
-        >
-            <v-icon color="white">mdi-send</v-icon>
-        </v-btn>
+    <div :class="{ 'with-files': withFiles, creator: true }">
+        <div class="files" v-if="this.attachment.length > 0">
+            <v-chip
+                close
+                @click:close="removeFile(index)"
+                v-for="(file, index) in attachment"
+                :key="index"
+                >{{ getName(file.name) }}</v-chip
+            >
+        </div>
+        <div class="content">
+            <twemoji-picker
+                :emojiData="emojiDataAll"
+                :emojiGroups="emojiGroups"
+                :skinsSelection="false"
+                :searchEmojisFeat="true"
+                searchEmojiPlaceholder="Search here."
+                searchEmojiNotFound="Emojis not found."
+                isLoadingLabel="Loading..."
+                pickerCloseOnClickaway
+                @emojiUnicodeAdded="emojiUnicodeAdded"
+                :emojiPickerDisabled="loading"
+            ></twemoji-picker>
+            <v-textarea
+                no-resize
+                filled
+                placeholder="Message here"
+                v-model="content"
+                clearable
+                rows="2"
+                rounded
+                dark
+                @keyup.enter="keysHandling"
+            >
+                <template v-slot:append>
+                    <v-icon
+                        :disabled="attachment.length > 5"
+                        @click="$refs.file.click()"
+                    >
+                        mdi-paperclip
+                    </v-icon>
+                </template></v-textarea
+            >
+
+            <input type="file" hidden ref="file" @change="addFile" />
+            <v-btn
+                :disabled="!this.content"
+                :loading="this.loading"
+                fab
+                dark
+                @click="send"
+            >
+                <v-icon color="white">mdi-send</v-icon>
+            </v-btn>
+        </div>
     </div>
 </template>
 
 <script>
+import { TwemojiPicker } from "@kevinfaguiar/vue-twemoji-picker";
+import EmojiAllData from "@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-all-groups.json";
+import EmojiDataAnimalsNature from "@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-group-animals-nature.json";
+import EmojiDataFoodDrink from "@kevinfaguiar/vue-twemoji-picker/emoji-data/en/emoji-group-food-drink.json";
+import EmojiGroups from "@kevinfaguiar/vue-twemoji-picker/emoji-data/emoji-groups.json";
 export default {
-    props: ["loading"],
+    components: { TwemojiPicker },
+    props: ["loading", "withFiles"],
     data: () => {
         return {
             content: "",
+            attachment: [],
         };
     },
     methods: {
         send() {
             if (this.content) {
-                this.$emit("send", this.content);
+                this.$emit("send", this.content, this.attachment);
+                this.attachment = [];
                 this.content = "";
+                this.$emit("changeWithFiles", false);
             }
         },
         keysHandling(event) {
@@ -43,6 +86,37 @@ export default {
                 return;
             }
             this.send();
+        },
+        addFile(e) {
+            this.attachment.push(e.target.files[0]);
+            console.log(e.target.files[0]);
+            this.$emit("changeWithFiles", true);
+        },
+        getName(name) {
+            let fname = name.split(".")[0];
+            let ext = name.split(".")[1];
+            console.log(fname + " " + fname.length);
+            if (fname.length > 10) {
+                fname = fname.substring(0, 7) + "..." + fname.substring(7, 10);
+            }
+            return fname + "." + ext;
+        },
+        removeFile(index) {
+            this.attachment.splice(index, 1);
+            if (this.attachment.length == 0) {
+                this.$emit("changeWithFiles", false);
+            }
+        },
+        emojiUnicodeAdded(emojiUnicode) {
+            this.content += emojiUnicode;
+        },
+    },
+    computed: {
+        emojiDataAll() {
+            return EmojiAllData;
+        },
+        emojiGroups() {
+            return EmojiGroups;
         },
     },
 };
@@ -54,9 +128,30 @@ export default {
     width: 50%;
     height: 15%;
     bottom: 0;
-    display: flex;
+    display: inline;
     background: rgb(33, 33, 33);
     padding: 10px;
+}
+.content {
+    display: flex;
+}
+.files {
+    display: flex;
+    overflow: hidden;
+    margin-bottom: 3px;
+}
+
+.files::-webkit-scrollbar {
+    width: 5px;
+    border-radius: 100px;
+}
+.files::-webkit-scrollbar-thumb {
+    background-color: white;
+    display: none;
+    border-radius: 5px;
+}
+.files::-webkit-scrollbar-thumb:hover {
+    display: initial;
 }
 .v-btn {
     margin-left: 3px;
@@ -65,5 +160,8 @@ export default {
     .creator {
         width: 61%;
     }
+}
+.with-files {
+    height: 18%;
 }
 </style>

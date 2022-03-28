@@ -47,6 +47,7 @@ export default {
     border-bottom: 2px solid black;
     display: flex;
     cursor: pointer;
+    z-index: 1000;
 }
 .avatar {
     max-height: 50px;

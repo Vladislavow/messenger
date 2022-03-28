@@ -2,7 +2,10 @@
     <div class="board">
         <message-nav :class="this.selectedProfile ? '' : 'closedProfile'" />
         <message-list
-            :class="this.selectedProfile ? '' : 'ms'"
+            :class="{
+                ms: !this.selectedProfile,
+                'with-filles': this.withFiles,
+            }"
             v-if="chat"
             :loading="this.loading"
             :messages="this.messages"
@@ -18,10 +21,12 @@
             v-if="chat"
             @send="send"
             :loading="this.loading"
+            :withFiles="this.withFiles"
+            @changeWithFiles="changeWithFiles"
         />
         <profile v-if="selectedProfile" />
         <v-progress-circular
-            v-if="loading"
+            v-if="loading && messages == 0"
             :class="{ loadwp: this.selectedProfile, load: true }"
             color="white"
             size="50"
@@ -49,6 +54,7 @@ export default {
             cancelToken: null,
             source: null,
             Echo: null,
+            withFiles: false,
         };
     },
     destroyed() {
@@ -84,10 +90,7 @@ export default {
                         this.handleDeleted(e.message);
                     });
             })
-            .catch((err) => {
-                // this.$store.dispatch("logout");
-                // this.$router.push("/");
-            });
+            .catch((err) => {});
     },
     watch: {
         chat: function (val) {
@@ -98,6 +101,9 @@ export default {
         },
     },
     methods: {
+        changeWithFiles(value) {
+            this.withFiles = value;
+        },
         marAsRead(chat) {
             if (this.chat == chat) {
                 this.setRead();
@@ -175,22 +181,24 @@ export default {
                 message: message,
             });
         },
-        send(text) {
+        send(text, attachment) {
             this.loading = true;
-            axios
-                .post("/api/chats/messages", {
-                    content: text,
-                    sender: this.userId,
-                    recipient: this.chat,
-                })
-                .then((resp) => {
-                    this.messages.push(resp.data);
-                    this.loading = false;
-                    this.$store.dispatch("setLastMessage", {
-                        sender: resp.data.recipient,
-                        message: resp.data,
-                    });
+            const config = { "content-type": "multipart/form-data" };
+            const formData = new FormData();
+            formData.append("content", text);
+            formData.append("sender", this.userId);
+            formData.append("recipient", this.chat);
+            attachment.forEach((file) => {
+                formData.append("attachment[]", file);
+            });
+            axios.post("/api/chats/messages", formData, config).then((resp) => {
+                this.messages.push(resp.data);
+                this.loading = false;
+                this.$store.dispatch("setLastMessage", {
+                    sender: resp.data.recipient,
+                    message: resp.data,
                 });
+            });
         },
         stopLoading() {
             this.loading = false;
@@ -247,5 +255,8 @@ export default {
         left: 14%;
         right: 25%;
     }
+}
+.with-filles {
+    height: 74%;
 }
 </style>

@@ -19,6 +19,11 @@
                 <div class="title">{{ getTitle() }}</div>
                 <div v-if="chat.last_message" class="lastMessage">
                     {{ getLastMessage() }}
+                    <v-icon
+                        v-if="chat.last_message.attachments.length > 0"
+                        color="rgb(204, 197, 197)"
+                        >mdi-attachment</v-icon
+                    >
                 </div>
             </div>
             <div v-if="chat.last_message && myMessage()" class="my_unread">
@@ -139,7 +144,7 @@ export default {
     border-radius: 50%;
 }
 .lastMessage {
-    color: rgb(204, 197, 197);
+    color: rgb(204, 197, 197) !important;
 }
 .my_unread {
     position: absolute;

@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
+use App\Models\Attachment;
 
 class MessageController extends Controller
 {
@@ -25,7 +26,7 @@ class MessageController extends Controller
             $query->where('sender', $id);
             $query->where('recipient', $user->id);
         })->where('read', false)->update(['read' => true]);
-        $messages = Message::where(function ($query) use ($id, $user) {
+        $messages = Message::with('attachments')->where(function ($query) use ($id, $user) {
             $query->where('sender', $user->id);
             $query->where('recipient', $id);
         })->orWhere(function ($query) use ($id, $user) {
@@ -47,15 +48,6 @@ class MessageController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create(StoreMessageRequest $request)
-    {
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\StoreMessageRequest  $request
@@ -64,50 +56,26 @@ class MessageController extends Controller
     public function store(StoreMessageRequest $request)
     {
         $validatedFields = $request->validated();
-        /** @var User $user */
-        $user = auth()->user();
-        Message::where(function ($query) use ($request, $user) {
-            $query->where('sender', $request->recipient);
-            $query->where('recipient', $user->id);
-        })->where('read', false)->update(['read' => true]);
         $message = Message::create($validatedFields);
         $message->read = false;
+        $this->storeAttachment($request->attachment, $message);
+        $message = Message::with('attachments')->find($message->id);
         broadcast(new NewMessage($message));
         return response()->json($message);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Message  $message
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Message $message)
+    public function storeAttachment($files, $message)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Message  $message
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Message $message)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateMessageRequest  $request
-     * @param  \App\Models\Message  $message
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateMessageRequest $request, Message $message)
-    {
-        //
+        if ($files && count($files) > 0) {
+            foreach ($files as $file) {
+                $attachment = new Attachment();
+                $attachment->message_id = $message->id;
+                $attachment->original_name = $file->getClientOriginalName();
+                $attachment->path = 'storage/' . $file->store('/attachment', 'public');
+                $attachment->extension = pathinfo($attachment->path, PATHINFO_EXTENSION);
+                $attachment->save();
+            }
+        }
     }
 
     /**

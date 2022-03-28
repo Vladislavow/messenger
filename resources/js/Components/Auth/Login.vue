@@ -10,6 +10,7 @@
                 :error-messages="this.errors.email"
                 readonly
                 onfocus="this.removeAttribute('readonly')"
+                @keyup.enter.prevent="$refs.password.focus()"
             />
             <v-text-field
                 dark
@@ -23,6 +24,8 @@
                 @click:append="show = !show"
                 readonly
                 onfocus="this.removeAttribute('readonly')"
+                @keypress.enter="login"
+                ref="password"
             />
             <v-btn dark @click.prevent="login" :loading="loading"> Enter</v-btn>
             <router-link to="/register">

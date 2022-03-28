@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,5 +28,10 @@ class Message extends Model
     public function recipient()
     {
         return $this->hasOne(User::class, 'id', 'recipient');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(Attachment::class, 'message_id', 'id');
     }
 }

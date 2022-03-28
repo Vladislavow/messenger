@@ -43,7 +43,8 @@ class User extends Authenticatable
     ];
 
     public $appends = [
-        'last_message'
+        'last_message',
+        'unread'
     ];
     /**
      * The attributes that should be cast.
@@ -65,6 +66,17 @@ class User extends Authenticatable
         return Storage::url($value);
     }
 
+    public function getUnreadAttribute($value)
+    {
+        /** @var User $user */
+        $user = auth()->user();
+        if ($user) {
+            return count(Message::where('recipient', $user->id)
+                ->where('sender', $this->id)
+                ->where('read', false)->get());
+        }
+    }
+
     public function messages()
     {
         return $this->hasMany(Message::class, 'sender', 'id');
@@ -77,7 +89,7 @@ class User extends Authenticatable
             $user = auth()->user();
             $id = $this->id;
             if ($id != $user->id) {
-                return Message::where(function ($query) use ($id, $user) {
+                return Message::with('attachments')->where(function ($query) use ($id, $user) {
                     $query->where('sender', $user->id);
                     $query->where('recipient', $id);
                 })->orWhere(function ($query) use ($id, $user) {

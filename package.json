@@ -25,6 +25,7 @@
         "vue-template-compiler": "^2.6.12"
     },
     "dependencies": {
+        "@kevinfaguiar/vue-twemoji-picker": "^5.7.4",
         "laravel-echo": "^1.11.4",
         "moment-timezone": "^0.5.34",
         "pusher-js": "^7.0.6",

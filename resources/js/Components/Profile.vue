@@ -19,6 +19,7 @@
         />
         <div class="img-container">
             <v-img
+                contain
                 class="image"
                 :src="this.chat.avatar"
                 max-height="40%"
@@ -322,12 +323,14 @@ export default {
     color: white;
     font-size: 30px;
     word-break: break-all;
+    margin-left: 5px;
 }
 .information {
     color: white;
     font-size: 22px;
 }
 .information * {
+    word-break: break-all;
     padding: 5px 7px;
     border-radius: 10px;
     margin: 2px;

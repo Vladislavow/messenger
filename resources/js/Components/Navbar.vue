@@ -120,6 +120,7 @@ export default {
     display: flex;
     min-height: 58px;
     border-right: 1px solid black;
+    z-index: 1000;
 }
 
 @media (max-width: 700px) {

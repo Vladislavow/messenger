@@ -7,6 +7,52 @@
         @contextmenu.prevent="show"
     >
         <div class="content">
+            <div v-if="message.attachments.length > 0">
+                <div v-for="(file, index) in message.attachments" :key="index">
+                    <v-img
+                        class="img-file"
+                        v-if="imgExtensions.includes(file.extension)"
+                        :key="index"
+                        :src="file.path"
+                        max-width="300"
+                    >
+                        <template>
+                            <v-icon
+                                @click.prevent="download(file)"
+                                cmall
+                                class="img-downolad"
+                                color="white"
+                            >
+                                mdi-download</v-icon
+                            >
+                        </template>
+                        <template v-slot:placeholder>
+                            <v-row
+                                class="fill-height ma-0"
+                                align="center"
+                                justify="center"
+                            >
+                                <v-progress-circular
+                                    indeterminate
+                                    color="grey lighten-5"
+                                ></v-progress-circular>
+                            </v-row> </template
+                    ></v-img>
+                    <div
+                        class="file"
+                        @click="download(file)"
+                        v-if="!imgExtensions.includes(file.extension)"
+                    >
+                        <v-icon class="file-ico" color="black" large
+                            >mdi-file</v-icon
+                        >
+                        <v-icon class="load-ico" color="black" large
+                            >mdi-file-download</v-icon
+                        >
+                        {{ file.original_name }}
+                    </div>
+                </div>
+            </div>
             {{ message.content }}
             <div class="statuses">
                 <span class="time">
@@ -14,15 +60,6 @@
                         message.created_at
                             | moment("timezone", "Europe/Kiev", "hh:mm")
                     }}
-                    <!-- {{
-                        ("0" + new Date(message.created_at).getHours()).slice(
-                            -2
-                        ) +
-                        ":" +
-                        ("0" + new Date(message.created_at).getMinutes()).slice(
-                            -2
-                        )
-                    }} -->
                 </span>
                 <span class="read">
                     <v-icon small v-if="userId != message.recipient">{{
@@ -48,6 +85,7 @@ export default {
             showMenu: false,
             x: 0,
             y: 0,
+            imgExtensions: ["jpeg", "jpg", "gif", "png", "apng", "svg", "bmp"],
         };
     },
     props: ["message", "userId"],
@@ -68,6 +106,13 @@ export default {
         },
         deleteMessage() {
             this.$emit("deleteMessage", this.message);
+        },
+        download(file) {
+            var fileLink = document.createElement("a");
+            fileLink.href = file.path;
+            fileLink.setAttribute("download", `${file.original_name}`);
+            document.body.appendChild(fileLink);
+            fileLink.click();
         },
     },
 };
@@ -136,5 +181,31 @@ export default {
     -moz-user-select: none;
     -webkit-user-select: none;
     user-select: none;
+}
+
+.file {
+    color: black;
+    padding: 5px;
+    font-size: 18px;
+}
+.file:hover .load-ico {
+    display: inline-flex !important;
+}
+.file:hover .file-ico {
+    display: none !important;
+}
+.load-ico {
+    display: none !important;
+}
+.img-file {
+    border-radius: 15px;
+    margin-top: 5px;
+}
+.img-file:hover .img-downolad {
+    display: inline-block !important;
+}
+.img-downolad {
+    display: none !important;
+    margin: 5px;
 }
 </style>
