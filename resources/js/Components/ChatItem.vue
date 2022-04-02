@@ -39,6 +39,7 @@
             >
                 {{ chat.unread > 99 ? "99+" : chat.unread }}
             </div>
+            <div class="online" v-if="chat.status == true"></div>
         </div>
     </div>
 </template>
@@ -149,5 +150,15 @@ export default {
 .my_unread {
     position: absolute;
     right: 13px;
+}
+.online {
+    content: " ";
+    border-radius: 50%;
+    background: #2fbd2f;
+    position: absolute;
+    height: 10px;
+    width: 10px;
+    margin-left: 42px;
+    margin-top: 42px;
 }
 </style>

@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Events\HasRead;
 use App\Events\MessageDeleted;
+use App\Events\MessageUpdated;
 use App\Events\NewMessage;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
 use App\Models\Attachment;
+use Illuminate\Support\Facades\Storage;
 
 class MessageController extends Controller
 {
@@ -78,6 +80,15 @@ class MessageController extends Controller
         }
     }
 
+    public function update(UpdateMessageRequest  $request, Message $message)
+    {
+        $validatedFields = $request->validated();
+        $message->update($validatedFields);
+        $this->storeAttachment($request->attachment, $message);
+        $message = Message::with('attachments')->find($message->id);
+        broadcast(new MessageUpdated($message));
+        return response()->json($message);
+    }
     /**
      * Remove the specified resource from storage.
      *
@@ -89,5 +100,28 @@ class MessageController extends Controller
         $message->delete();
         broadcast(new MessageDeleted($message));
         return response()->json('deleted', 200);
+    }
+
+    public function downloadAttachment(Attachment $attachment)
+    {
+        /** @var User $user */
+        $user = auth()->user();
+        $message = Message::find($attachment->message_id);
+        if ($user->id == $message->sender || $user->id == $message->recipient) {
+            return response()->download($attachment->path);
+        } else {
+            return response()->json('Access denied', 503);
+        }
+    }
+
+    public function deleteAttachment(Attachment $attachment)
+    {
+        $message_id = $attachment->message->id;
+        if (Storage::exists($attachment->path)) {
+            Storage::delete($attachment->path);
+        }
+        $attachment->delete();
+        broadcast(new MessageUpdated(Message::with('attachments')->where('id', $message_id)->first()));
+        return response()->json('Attechament deleted', 200);
     }
 }

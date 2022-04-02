@@ -1,6 +1,21 @@
 <template>
     <div :class="{ 'with-files': withFiles, creator: true }">
-        <div class="files" v-if="this.attachment.length > 0">
+        <div
+            class="files"
+            v-if="
+                this.attachment.length > 0 ||
+                (updateMessage && this.updatingAttachment.length > 0)
+            "
+        >
+            <span v-if="updatingAttachment">
+                <v-chip
+                    close
+                    @click:close="handleDeleteing(file, index)"
+                    v-for="(file, index) in updatingAttachment"
+                    :key="index"
+                    >{{ getName(file.original_name) }}</v-chip
+                >
+            </span>
             <v-chip
                 close
                 @click:close="removeFile(index)"
@@ -23,6 +38,7 @@
                 :emojiPickerDisabled="loading"
             ></twemoji-picker>
             <v-textarea
+                class="text"
                 no-resize
                 filled
                 placeholder="Message here"
@@ -33,9 +49,18 @@
                 dark
                 @keyup.enter="keysHandling"
             >
+                <template v-if="updateMessage != null" v-slot:prepend>
+                    <v-icon @click="closeUpdate"> mdi-pencil-remove </v-icon>
+                </template>
                 <template v-slot:append>
                     <v-icon
-                        :disabled="attachment.length > 5"
+                        :disabled="
+                            attachment.length +
+                                (updatingAttachment
+                                    ? updatingAttachment.length
+                                    : 0) >
+                            5
+                        "
                         @click="$refs.file.click()"
                     >
                         mdi-paperclip
@@ -51,9 +76,39 @@
                 dark
                 @click="send"
             >
-                <v-icon color="white">mdi-send</v-icon>
+                <v-icon color="white">{{
+                    updateMessage != null ? "mdi-pencil" : "mdi-send"
+                }}</v-icon>
             </v-btn>
         </div>
+        <v-dialog
+            transition="dialog-bottom-transition"
+            v-model="dialog"
+            persistent
+            max-width="290"
+        >
+            <v-card>
+                <v-card-title class="text-h5">
+                    Delete attachment?
+                </v-card-title>
+
+                <v-card-text>
+                    You will not be able to undo this action
+                </v-card-text>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn color="green darken-1" text @click="dialog = false">
+                        Close
+                    </v-btn>
+
+                    <v-btn color="green darken-1" text @click="deleteFile">
+                        Delete
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -70,22 +125,52 @@ export default {
         return {
             content: "",
             attachment: [],
+            updating: {},
+            updatingAttachment: [],
+            dialog: false,
+            deleteingFile: {
+                file: null,
+                index: null,
+            },
         };
     },
+    watch: {
+        updateMessage: function (value) {
+            if (value) {
+                console.log(value);
+                this.content = this.updateMessage.content;
+                this.attachment = [];
+                this.updatingAttachment = this.updateMessage.attachments;
+            }
+        },
+    },
     methods: {
+        closeUpdate() {
+            this.$store.dispatch("changeUpdateMessage", null);
+            this.content = "";
+        },
         send() {
             if (this.content) {
-                this.$emit("send", this.content, this.attachment);
-                this.attachment = [];
-                this.content = "";
-                this.$emit("changeWithFiles", false);
+                if (this.updateMessage) {
+                    this.$emit("updateMessage", this.content, this.attachment);
+                    this.content = "";
+                    this.attachment = [];
+                    this.updatingAttachment = [];
+                } else {
+                    this.$emit("send", this.content, this.attachment);
+                    this.attachment = [];
+                    this.content = "";
+                    this.$emit("changeWithFiles", false);
+                }
             }
         },
         keysHandling(event) {
+            event.preventDefault();
             if (event.shiftKey === true && event.key === "Enter") {
                 return;
             }
             this.send();
+            return false;
         },
         addFile(e) {
             this.attachment.push(e.target.files[0]);
@@ -101,11 +186,26 @@ export default {
             }
             return fname + "." + ext;
         },
+        handleDeleteing(file, index) {
+            this.dialog = true;
+            this.deleteingFile = { file: file, index: index };
+        },
         removeFile(index) {
             this.attachment.splice(index, 1);
             if (this.attachment.length == 0) {
                 this.$emit("changeWithFiles", false);
             }
+        },
+        deleteFile() {
+            axios
+                .delete("/api/attachment/" + this.deleteingFile.file.id)
+                .then((response) => {
+                    this.updatingAttachment.splice(this.deleteingFile.index, 1);
+                })
+                .finally(() => {
+                    this.deleteingFile = null;
+                    this.dialog = false;
+                });
         },
         emojiUnicodeAdded(emojiUnicode) {
             this.content += emojiUnicode;
@@ -118,18 +218,21 @@ export default {
         emojiGroups() {
             return EmojiGroups;
         },
+        updateMessage: function () {
+            return this.$store.getters.updateMessage;
+        },
     },
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .creator {
     position: fixed;
     width: 50%;
     height: 15%;
     bottom: 0;
     display: inline;
-    background: rgb(33, 33, 33);
+    background: rgba(33, 33, 33, 0);
     padding: 10px;
 }
 .content {
@@ -163,5 +266,20 @@ export default {
 }
 .with-files {
     height: 18%;
+}
+
+.text {
+    overflow: hidden !important;
+}
+
+textarea * {
+    display: none !important;
+    overflow: hidden !important;
+}
+
+.text::-webkit-scrollbar-thumb {
+    background-color: white;
+    display: none;
+    border-radius: 5px;
 }
 </style>

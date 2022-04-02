@@ -13,6 +13,7 @@ export default new Vuex.Store({
         selectedProfile: null,
         search: false,
         searchedChats: null,
+        updateMessage: null,
     },
     mutations: {
         auth_request(state) {
@@ -121,6 +122,16 @@ export default new Vuex.Store({
                     state.chats.find((schat) => schat.id == chat)
                 )
             ].last_message.read = true;
+        },
+        set_status(state, data) {
+            state.chats[
+                state.chats.indexOf(
+                    state.chats.find((user) => user.id == data.id)
+                )
+            ].status = data.status;
+        },
+        set_update_message(state, message) {
+            state.updateMessage = message;
         },
     },
     actions: {
@@ -233,6 +244,12 @@ export default new Vuex.Store({
         setLastMessageAsRead({ commit }, chat) {
             commit("set_last_message_as_read", chat);
         },
+        changeOnlineStatus({ commit }, data) {
+            commit("set_status", data);
+        },
+        changeUpdateMessage({ commit }, message) {
+            commit("set_update_message", message);
+        },
     },
     getters: {
         isLoggedIn: (state) => !!state.token,
@@ -249,5 +266,6 @@ export default new Vuex.Store({
             ],
         search: (state) => state.search,
         searchedChats: (state) => state.searchedChats,
+        updateMessage: (state) => state.updateMessage,
     },
 });

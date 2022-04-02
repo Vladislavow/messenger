@@ -1,6 +1,9 @@
 <template>
     <div class="board">
-        <message-nav :class="this.selectedProfile ? '' : 'closedProfile'" />
+        <message-nav
+            v-if="chat"
+            :class="this.selectedProfile ? '' : 'closedProfile'"
+        />
         <message-list
             :class="{
                 ms: !this.selectedProfile,
@@ -14,7 +17,7 @@
             :totalPages="this.totalPages"
             @loaded="stopLoading"
             @getMessages="getMessages"
-            @deleteMessage="deleteMessage"
+            @deleteMessage="showDeleteDialog"
         />
         <message-creator
             :class="this.selectedProfile ? '' : 'ms'"
@@ -23,6 +26,7 @@
             :loading="this.loading"
             :withFiles="this.withFiles"
             @changeWithFiles="changeWithFiles"
+            @updateMessage="updateMessage"
         />
         <profile v-if="selectedProfile" />
         <v-progress-circular
@@ -34,6 +38,37 @@
             indeterminate
         >
         </v-progress-circular>
+        <img
+            class="pam"
+            src="images/animated_back.svg"
+            alt="Kiwi standing on oval"
+        />
+        <v-dialog
+            transition="dialog-bottom-transition"
+            v-model="dialog"
+            persistent
+            max-width="290"
+        >
+            <v-card>
+                <v-card-title class="text-h5"> Delete message? </v-card-title>
+
+                <v-card-text>
+                    You will not be able to undo this action
+                </v-card-text>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn color="green darken-1" text @click="dialog = false">
+                        Close
+                    </v-btn>
+
+                    <v-btn color="green darken-1" text @click="deleteMessage">
+                        Delete
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -55,10 +90,14 @@ export default {
             source: null,
             Echo: null,
             withFiles: false,
+            online: [],
+            dialog: false,
+            deleteableMessage: null,
         };
     },
     destroyed() {
         this.Echo.disconnect();
+        window.localStorage.setItem("titleName", "awd");
     },
     mounted() {
         this.Echo = new Echo({
@@ -73,6 +112,12 @@ export default {
                 },
             },
         });
+        this.Echo.connector.pusher.connection.bind(
+            "disconnected",
+            (payload) => {
+                localStorage.setItem("hi", "oi");
+            }
+        );
         this.$store
             .dispatch("getUser")
             .then((response) => {
@@ -88,6 +133,23 @@ export default {
                     })
                     .listen("MessageDeleted", (e) => {
                         this.handleDeleted(e.message);
+                    })
+                    .listen("MessageUpdated", (e) => {
+                        this.handleUpdated(e.message);
+                    });
+                this.Echo.join(`chat.1`)
+                    .here((users) => {})
+                    .joining((user) => {
+                        this.$store.dispatch("changeOnlineStatus", {
+                            status: true,
+                            id: user.id,
+                        });
+                    })
+                    .leaving((user) => {
+                        this.$store.dispatch("changeOnlineStatus", {
+                            status: false,
+                            id: user.id,
+                        });
                     });
             })
             .catch((err) => {});
@@ -101,6 +163,10 @@ export default {
         },
     },
     methods: {
+        showDeleteDialog(message) {
+            this.deleteableMessage = message;
+            this.dialog = true;
+        },
         changeWithFiles(value) {
             this.withFiles = value;
         },
@@ -111,19 +177,69 @@ export default {
                 this.$store.dispatch("setLastMessageAsRead", chat);
             }
         },
-        deleteMessage(message) {
-            axios.delete("/api/message/" + message.id).then((response) => {
-                let id = this.messages.indexOf(
-                    this.messages.find((messagef) => messagef.id == message.id)
-                );
-                this.messages.splice(id, 1);
-
-                let lastmessage = this.messages[this.messages.length - 1];
-                this.$store.dispatch("setLastMessage", {
-                    sender: this.chat,
-                    message: lastmessage,
-                });
+        updateMessage(content, attachment) {
+            const config = { "content-type": "multipart/form-data" };
+            const formData = new FormData();
+            formData.append("content", content);
+            attachment.forEach((file) => {
+                formData.append("attachment[]", file);
             });
+            axios
+                .post(
+                    "/api/message/" + this.$store.getters.updateMessage.id,
+                    formData,
+                    config
+                )
+                .then((resp) => {
+                    console.log(resp.data);
+                    this.messages.splice(
+                        [
+                            this.messages.indexOf(
+                                this.messages.find(
+                                    (message) => message.id == resp.data.id
+                                )
+                            ),
+                        ],
+                        1,
+                        resp.data
+                    );
+                    this.$store.dispatch("changeUpdateMessage", null);
+                });
+        },
+        deleteMessage() {
+            this.dialog = false;
+            axios
+                .delete("/api/message/" + this.deleteableMessage.id)
+                .then((response) => {
+                    let id = this.messages.indexOf(
+                        this.messages.find(
+                            (messagef) =>
+                                messagef.id == this.deleteableMessage.id
+                        )
+                    );
+                    this.messages.splice(id, 1);
+                    this.deleteableMessage = null;
+                    let lastmessage = this.messages[this.messages.length - 1];
+                    this.$store.dispatch("setLastMessage", {
+                        sender: this.chat,
+                        message: lastmessage,
+                    });
+                });
+        },
+        handleUpdated(updated_message) {
+            if (this.chat == updated_message.sender) {
+                this.messages.splice(
+                    [
+                        this.messages.indexOf(
+                            this.messages.find(
+                                (message) => message.id == updated_message.id
+                            )
+                        ),
+                    ],
+                    1,
+                    updated_message
+                );
+            }
         },
         handleDeleted(message) {
             if (this.chat == message.sender) {
@@ -191,14 +307,18 @@ export default {
             attachment.forEach((file) => {
                 formData.append("attachment[]", file);
             });
-            axios.post("/api/chats/messages", formData, config).then((resp) => {
-                this.messages.push(resp.data);
-                this.loading = false;
-                this.$store.dispatch("setLastMessage", {
-                    sender: resp.data.recipient,
-                    message: resp.data,
+            axios
+                .post("/api/chats/messages", formData, config)
+                .then((resp) => {
+                    this.messages.push(resp.data);
+                    this.$store.dispatch("setLastMessage", {
+                        sender: resp.data.recipient,
+                        message: resp.data,
+                    });
+                })
+                .finally(() => {
+                    this.loading = false;
                 });
-            });
         },
         stopLoading() {
             this.loading = false;
@@ -258,5 +378,10 @@ export default {
 }
 .with-filles {
     height: 74%;
+}
+.pam {
+    z-index: 9999;
+    height: 100%;
+    width: auto;
 }
 </style>

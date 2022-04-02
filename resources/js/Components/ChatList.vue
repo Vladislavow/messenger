@@ -3,12 +3,15 @@
         <div v-for="(chat, index) in chats" :key="index">
             <chat-item :chat="chat" />
         </div>
-        <div v-if="this.chats.length == 0" class="empty">
+        <div v-if="this.chats.length == 0 && !this.loading" class="empty">
             {{
                 this.$store.getters.search
                     ? "No results..."
                     : "No chats started yet"
             }}
+        </div>
+        <div class="loading">
+            <v-progress-circular color="white" size="50" indeterminate />
         </div>
     </div>
 </template>
@@ -18,11 +21,16 @@ import ChatItem from "./ChatItem.vue";
 export default {
     components: { ChatItem },
     data: () => {
-        return {};
+        return {
+            loading: false,
+        };
     },
     methods: {
         getChatList() {
-            this.$store.dispatch("getChats");
+            this.loading = true;
+            this.$store.dispatch("getChats").finally(() => {
+                this.laoding = false;
+            });
         },
     },
     created() {
@@ -90,5 +98,10 @@ var sortByDate = function (d1, d2) {
     text-align: center;
     font-size: 24px;
     margin-top: 10px;
+}
+
+.loading {
+    margin-top: 10px;
+    text-align: center;
 }
 </style>

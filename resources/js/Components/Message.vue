@@ -18,6 +18,7 @@
                     >
                         <template>
                             <v-icon
+                                v-if="!loading"
                                 @click.prevent="download(file)"
                                 cmall
                                 class="img-downolad"
@@ -25,6 +26,11 @@
                             >
                                 mdi-download</v-icon
                             >
+                            <v-progress-circular
+                                v-if="loading"
+                                indeterminate
+                                color="white"
+                            ></v-progress-circular>
                         </template>
                         <template v-slot:placeholder>
                             <v-row
@@ -53,7 +59,7 @@
                     </div>
                 </div>
             </div>
-            {{ message.content }}
+            <span parseLinks>{{ message.content }}</span>
             <div class="statuses">
                 <span class="time">
                     {{
@@ -68,10 +74,24 @@
                 </span>
             </div>
         </div>
-        <v-menu v-model="showMenu" :position-x="x" :position-y="y" offset-y>
+        <v-menu
+            dark
+            v-model="showMenu"
+            :position-x="x"
+            :position-y="y"
+            offset-y
+        >
             <v-list>
                 <div @mouseleave="hide">
-                    <v-list-item @click="deleteMessage"> Delete </v-list-item>
+                    <v-list-item @click="updateMessage"
+                        ><v-icon>mdi-pencil</v-icon> Update
+                    </v-list-item>
+                    <v-list-item
+                        color="purple"
+                        class="delete"
+                        @click="deleteMessage"
+                        ><v-icon color="red">mdi-delete</v-icon> Delete
+                    </v-list-item>
                 </div>
             </v-list>
         </v-menu>
@@ -86,6 +106,7 @@ export default {
             x: 0,
             y: 0,
             imgExtensions: ["jpeg", "jpg", "gif", "png", "apng", "svg", "bmp"],
+            loading: false,
         };
     },
     props: ["message", "userId"],
@@ -104,15 +125,34 @@ export default {
         hide() {
             this.showMenu = false;
         },
+        updateMessage() {
+            this.$store.dispatch("changeUpdateMessage", this.message);
+        },
         deleteMessage() {
             this.$emit("deleteMessage", this.message);
         },
         download(file) {
-            var fileLink = document.createElement("a");
-            fileLink.href = file.path;
-            fileLink.setAttribute("download", `${file.original_name}`);
-            document.body.appendChild(fileLink);
-            fileLink.click();
+            this.loading = true;
+            axios
+                .get("/api/download/" + file.id, {
+                    responseType: "blob",
+                })
+                .then((response) => {
+                    var fileURL = window.URL.createObjectURL(
+                        new Blob([response.data])
+                    );
+                    var fileLink = document.createElement("a");
+                    fileLink.href = fileURL;
+                    fileLink.setAttribute("download", `${file.original_name}`);
+                    document.body.appendChild(fileLink);
+                    fileLink.click();
+                })
+                .catch((error) => {
+                    this.$toast.error(error.response.data.message);
+                })
+                .finally(() => {
+                    this.loading = false;
+                });
         },
     },
 };
@@ -207,5 +247,9 @@ export default {
 .img-downolad {
     display: none !important;
     margin: 5px;
+}
+
+.delete {
+    color: red;
 }
 </style>

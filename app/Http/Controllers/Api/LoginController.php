@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\ChatUpdated;
 use App\Events\ChatUpdatedEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
@@ -39,27 +38,5 @@ class LoginController extends Controller
         } else {
             return redirect('/login');
         }
-    }
-
-    public function updateUser(UpdateUserRequest $request)
-    {
-        /** @var User $user */
-        $user = auth()->user();
-        $validatedFields = $request->validated();
-        $user->update($validatedFields);
-        $user->save();
-        (new SendAllContacts(ChatUpdated::class, $user))->handle();
-        return response()->json('Profile updated', 200);
-    }
-
-    public function updateAvatar(UpdateUserAvatarRequest $request)
-    {
-        /** @var User $user */
-        $user = auth()->user();
-        $validatedFields = $request->validated();
-        $user->avatar =  $request->avatar->store('/', 'public');
-        $user->save();
-        (new SendAllContacts(ChatUpdated::class, $user))->handle();
-        return response()->json('Avatar updated', 200);
     }
 }

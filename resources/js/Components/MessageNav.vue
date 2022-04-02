@@ -39,7 +39,7 @@ export default {
     position: fixed;
     height: 8%;
     width: 50%;
-    background: rgb(33, 33, 33);
+    background: rgba(33, 33, 33, 0.9);
     margin: 0;
     top: 0;
     padding: 4px 15px;

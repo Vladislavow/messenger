@@ -100,7 +100,7 @@ export default {
     position: fixed;
     width: 50%;
     height: 77%;
-    background: rgb(33, 33, 33);
+    background: rgba(33, 33, 33, 0);
     overflow: scroll;
     overflow-x: hidden;
     display: flex;
