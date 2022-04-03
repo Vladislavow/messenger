@@ -96,32 +96,14 @@ export default {
         };
     },
     destroyed() {
-        this.Echo.disconnect();
+        window.Echo.disconnect();
         window.localStorage.setItem("titleName", "awd");
     },
     mounted() {
-        this.Echo = new Echo({
-            broadcaster: "pusher",
-            key: process.env.MIX_PUSHER_APP_KEY,
-            cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-            encrypted: true,
-            authEndpoint: `/api/broadcasting/auth`,
-            auth: {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            },
-        });
-        this.Echo.connector.pusher.connection.bind(
-            "disconnected",
-            (payload) => {
-                localStorage.setItem("hi", "oi");
-            }
-        );
         this.$store
             .dispatch("getUser")
             .then((response) => {
-                this.Echo.private(`messages.${response.data.id}`)
+                window.Echo.private(`messages.${response.data.id}`)
                     .listen("NewMessage", (e) => {
                         this.handleIncoming(e.message);
                     })
@@ -137,7 +119,8 @@ export default {
                     .listen("MessageUpdated", (e) => {
                         this.handleUpdated(e.message);
                     });
-                this.Echo.join(`chat.1`)
+
+                window.Echo.join(`chat.1`)
                     .here((users) => {})
                     .joining((user) => {
                         this.$store.dispatch("changeOnlineStatus", {
@@ -285,7 +268,7 @@ export default {
                 axios.post(`/api/chat/${message.sender}/markasread`);
                 this.setLastMessage(message);
             } else {
-                this.$toast.info("New message!");
+                this.$toast.info("New message!", {});
                 this.$store.dispatch("checkForChatExists", message).then(() => {
                     this.setLastMessage(message);
                 });

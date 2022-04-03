@@ -20,16 +20,6 @@ class Message extends Model
         'created_at' => 'datetime:Y-m-d H:i:s'
     ];
 
-    public function sender()
-    {
-        return $this->hasOne(User::class, 'id', 'sender');
-    }
-
-    public function recipient()
-    {
-        return $this->hasOne(User::class, 'id', 'recipient');
-    }
-
     public function attachments()
     {
         return $this->hasMany(Attachment::class, 'message_id', 'id');

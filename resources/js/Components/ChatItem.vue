@@ -39,7 +39,7 @@
             >
                 {{ chat.unread > 99 ? "99+" : chat.unread }}
             </div>
-            <div class="online" v-if="chat.status == true"></div>
+            <div class="online" v-if="chat.online == true"></div>
         </div>
     </div>
 </template>

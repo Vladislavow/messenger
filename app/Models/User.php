@@ -30,6 +30,8 @@ class User extends Authenticatable
         'avatar',
         'birthdate',
         'bio',
+        'online',
+        'last_seen',
     ];
 
     /**
@@ -53,7 +55,9 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'birthdate' => 'date:Y-m-d'
+        'birthdate' => 'date:Y-m-d',
+        'last_seen' => 'datetime:Y-m-d h:i:s',
+        'online' => 'boolean'
     ];
 
     public function setPasswordAttribute($password)

@@ -18,6 +18,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
     Route::put('/user', [UserController::class, 'updateUser']);
     Route::post('/user/avatar', [UserController::class, 'updateAvatar']);
+    Route::post('/user/online', [UserController::class, 'setOnlineStatus']);
 
     Route::get('/chats', [ChatController::class, 'getChats']);
     Route::get('/chat/{id}/messages', [MessageController::class, 'index']);

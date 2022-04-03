@@ -8,6 +8,8 @@ use App\Http\Requests\UpdateUserRequest;
 use App\Jobs\SendAllContacts;
 use Illuminate\Http\Request;
 use App\Events\ChatUpdated;
+use App\Http\Requests\OnlineStatusRequest;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -31,5 +33,16 @@ class UserController extends Controller
         $user->save();
         (new SendAllContacts(ChatUpdated::class, $user))->handle();
         return response()->json('Avatar updated', 200);
+    }
+
+    public function setOnlineStatus(OnlineStatusRequest $request)
+    {
+        /** @var User $user */
+        $user = auth()->user();
+        $validatedfields = $request->validated();
+        $user->online = $validatedfields['status'];
+        $user->last_seen = $validatedfields['status'] == true ? $user->last_seen : Carbon::now();
+        $user->save();
+        return response()->json('Status changed', 200);
     }
 }

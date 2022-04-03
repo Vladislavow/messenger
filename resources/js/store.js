@@ -128,7 +128,7 @@ export default new Vuex.Store({
                 state.chats.indexOf(
                     state.chats.find((user) => user.id == data.id)
                 )
-            ].status = data.status;
+            ].online = data.status;
         },
         set_update_message(state, message) {
             state.updateMessage = message;

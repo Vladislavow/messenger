@@ -10,8 +10,19 @@
                 </v-row>
             </template>
         </v-img>
-        <div v-if="chat" class="title">
-            {{ chat.firstname + " " + chat.lastname }}
+        <div class="information">
+            <div v-if="chat" class="title">
+                {{ chat.firstname + " " + chat.lastname }}
+            </div>
+            <div class="online">
+                {{
+                    chat.online
+                        ? "Online"
+                        : chat.last_seen
+                        ? chat.last_seen
+                        : "Offline"
+                }}
+            </div>
         </div>
     </div>
 </template>
@@ -59,8 +70,14 @@ export default {
     border-radius: 50%;
 }
 
-.title {
+.information {
     margin-left: 20px;
+    display: flex;
     color: white;
+
+    flex-direction: column;
+}
+.online {
+    font-size: 14px;
 }
 </style>
