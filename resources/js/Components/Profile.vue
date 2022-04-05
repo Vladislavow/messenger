@@ -288,7 +288,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .img-container {
     margin-top: 10px;
 }
@@ -301,6 +301,11 @@ export default {
     border-left: 1px solid black;
     overflow: scroll;
     overflow-x: hidden;
+    @media (max-width:424px) {
+        width: 100%;
+        right: 0px;
+        z-index: 999 !important;
+}
 }
 .profile::-webkit-scrollbar {
     width: 5px;

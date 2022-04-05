@@ -1,5 +1,5 @@
 <template>
-    <div class="board">
+    <div :class="{board:true, empty: (!chat && !selectedProfile)}">
         <message-nav
             v-if="chat"
             :class="this.selectedProfile ? '' : 'closedProfile'"
@@ -330,7 +330,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .board {
     height: 100%;
     width: 75%;
@@ -338,7 +338,17 @@ export default {
     position: fixed;
     top: 0;
     right: 0;
+    @media (max-width:424px) {
+        width: 100%;
+        left: 0 !important;
+    }
 }
+.empty{
+    @media (max-width:424px) {
+        display: none !important;
+    }
+}
+
 .ms {
     margin-left: 12.5%;
 }

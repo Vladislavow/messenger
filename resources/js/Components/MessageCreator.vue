@@ -234,6 +234,14 @@ export default {
     display: inline;
     background: rgba(33, 33, 33, 0);
     padding: 10px;
+    @media (min-height: 900px) {
+        height: 12% !important;
+    }
+    @media (max-width:424px) {
+        width: 100% !important;
+        left: 0 !important;
+        margin-left: 0px !important;
+    }
 }
 .content {
     display: flex;
@@ -266,6 +274,9 @@ export default {
 }
 .with-files {
     height: 18%;
+    @media (min-height: 900px) {
+        height: 13% !important;
+    }
 }
 
 .text {

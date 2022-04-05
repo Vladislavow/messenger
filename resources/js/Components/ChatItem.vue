@@ -95,14 +95,7 @@ export default {
 .content {
     margin-left: 15px;
 }
-@media (max-width: 700px) {
-    .title {
-        display: none;
-    }
-    .chat {
-        width: 60px;
-    }
-}
+
 
 .selected {
     background: rgb(75, 74, 72);

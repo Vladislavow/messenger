@@ -95,7 +95,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .messages {
     position: fixed;
     width: 50%;
@@ -106,6 +106,15 @@ export default {
     display: flex;
     flex-direction: column;
     top: 58px;
+
+    @media (min-height: 900px) {
+        height:82% !important;
+    }
+     @media (max-width:424px) {
+        width: 100% !important;
+        left: 0 !important;
+        margin-left: 0px !important;
+    }
 }
 .loadMore {
     margin-top: 3px;
