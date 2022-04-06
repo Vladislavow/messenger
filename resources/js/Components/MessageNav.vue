@@ -53,7 +53,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .navbar {
   min-height: 58px;
   position: fixed;
@@ -68,6 +68,9 @@ export default {
   cursor: pointer;
   z-index: 800;
   height: 40px;
+  @media (max-width:424px) {
+    width: 100%;
+  }
 }
 .avatar {
   max-height: 50px;
@@ -90,5 +93,9 @@ export default {
 }
 .close-btn {
   align-self: center;
+  display: none;
+  @media (max-width:424px) {
+    display: initial;
+  }
 }
 </style>

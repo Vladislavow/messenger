@@ -18,7 +18,7 @@ class CreateMessagesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('sender');
             $table->unsignedBigInteger('recipient');
-            $table->longText('content');
+            $table->longText('content')->nullable();
             $table->timestamps();
         });
     }
