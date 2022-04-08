@@ -14,6 +14,7 @@ export default new Vuex.Store({
         search: false,
         searchedChats: null,
         updateMessage: null,
+        selectedAudio:null
     },
     mutations: {
         auth_request(state) {
@@ -133,6 +134,9 @@ export default new Vuex.Store({
         set_update_message(state, message) {
             state.updateMessage = message;
         },
+        set_audio(state, audio){
+            state.selectedAudio = audio;
+        }
     },
     actions: {
         login({ commit }, user) {
@@ -250,6 +254,9 @@ export default new Vuex.Store({
         changeUpdateMessage({ commit }, message) {
             commit("set_update_message", message);
         },
+        changeSelectedAudio({commit}, audio){
+            commit('set_audio' , audio);
+        }
     },
     getters: {
         isLoggedIn: (state) => !!state.token,
@@ -267,5 +274,6 @@ export default new Vuex.Store({
         search: (state) => state.search,
         searchedChats: (state) => state.searchedChats,
         updateMessage: (state) => state.updateMessage,
+        selectedAudio: (state) =>state.selectedAudio,
     },
 });

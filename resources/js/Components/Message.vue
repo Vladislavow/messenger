@@ -9,12 +9,23 @@
     <div class="content">
       <div v-if="message.attachments.length > 0">
         <div v-for="(file, index) in message.attachments" :key="index">
+          <div
+            class="player"
+            v-if="audioExtensions.includes(file.extension)"
+          >
+          <v-btn dark fab x-small @click="selectAudio(file)"> 
+            <v-icon>mdi-play</v-icon>
+          </v-btn>
+          <div class="audio_title">{{ file.original_name }}</div>
+          </div>
           <v-img
             class="img-file"
             v-if="imgExtensions.includes(file.extension)"
             :key="index"
             :src="file.path"
             max-width="300"
+            lazy-src="storage/placeholder.png"
+            @load="scrollDown"
           >
             <template>
               <v-icon
@@ -43,7 +54,10 @@
           <div
             class="file"
             @click="download(file)"
-            v-if="!imgExtensions.includes(file.extension)"
+            v-if="
+              !imgExtensions.includes(file.extension) &&
+              !audioExtensions.includes(file.extension)
+            "
           >
             <v-icon class="file-ico" color="black" large>mdi-file</v-icon>
             <v-icon class="load-ico" color="black" large
@@ -53,7 +67,7 @@
           </div>
         </div>
       </div>
-      <span parseLinks>{{ message.content }}</span>
+      <span class="text">{{ message.content }}</span>
       <div class="statuses">
         <span class="time">
           {{ message.created_at | moment("timezone", "Europe/Kiev", "hh:mm") }}
@@ -88,11 +102,18 @@ export default {
       x: 0,
       y: 0,
       imgExtensions: ["jpeg", "jpg", "gif", "png", "apng", "svg", "bmp"],
+      audioExtensions: ["mp3"],
       loading: false,
     };
   },
   props: ["message", "userId"],
+  mounted() {
+
+  },
   methods: {
+    scrollDown(e) {
+      this.$emit("down");
+    },
     show(e) {
       e.preventDefault();
       if (this.message.sender == localStorage.getItem("userid")) {
@@ -112,6 +133,9 @@ export default {
     },
     deleteMessage() {
       this.$emit("deleteMessage", this.message);
+    },
+    selectAudio(file){
+      this.$store.dispatch('changeSelectedAudio', file)
     },
     download(file) {
       this.loading = true;
@@ -135,6 +159,7 @@ export default {
         });
     },
   },
+  computed: {},
 };
 </script>
 
@@ -170,6 +195,9 @@ export default {
     left: 20px;
   }
 }
+.text {
+  white-space: pre-wrap;
+}
 
 .time {
   position: inline;
@@ -195,8 +223,8 @@ export default {
   pointer-events: none;
   border-bottom-color: rgb(6, 153, 13);
   border-width: 10px;
-  @media (max-width:424px) {
-      bottom: 96% !important;
+  @media (max-width: 424px) {
+    bottom: 96% !important;
   }
 }
 
@@ -242,11 +270,18 @@ export default {
   display: none !important;
   margin: 5px;
 }
-.img-downolad:hover{
-    color: gold !important;
+.img-downolad:hover {
+  color: gold !important;
 }
 
 .delete {
   color: red;
+}
+.player{
+  display:flex;
+  align-items: center;
+}
+.audio_title{
+  margin-left: 10px;
 }
 </style>

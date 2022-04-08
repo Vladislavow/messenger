@@ -1,6 +1,6 @@
 <template>
   <div
-    @scroll="log"
+    @scroll="showScrollThumb"
     :class="{ messages: true, scroll: this.scroll_timer != null }"
     ref="container"
     id="mes"
@@ -31,8 +31,10 @@
         :message="message"
         :userId="userId"
         :key="index"
+        @down="scrollDown"
       />
     </template>
+    
   </div>
 </template>
 
@@ -50,18 +52,22 @@ export default {
   props: ["messages", "userId", "loading", "page", "totalPages"],
   watch: {
     messages: function (value) {
-      setTimeout(() => {
-        if (this.scrollLock) {
-          this.scrollLock = false;
-          return;
-        }
-        var container = document.getElementById("mes");
-        container.scrollTop = container.scrollHeight - container.clientHeight;
-      }, 50);
+      this.scrollDown();
     },
   },
   methods: {
-    log() {
+    scrollDown() {
+      if (this.scroll_timer == null)
+        setTimeout(() => {
+          if (this.scrollLock) {
+            this.scrollLock = false;
+            return;
+          }
+          var container = document.getElementById("mes");
+          container.scrollTop = container.scrollHeight - container.clientHeight;        
+       }, 50);
+    },
+    showScrollThumb() {
       this.scroll_timer = null;
       this.scroll_timer = setTimeout(() => {
         this.scroll_timer = null;
@@ -101,6 +107,12 @@ export default {
     },
   },
   mounted() {},
+  computed:{
+    onBottom:function(){
+       var container = document.getElementById("mes");
+      return (container.scrollHeight - container.clientHeight) == container.scrollTop;
+    }
+  }
 };
 </script>
 

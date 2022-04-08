@@ -1,11 +1,13 @@
 <template>
-  <div :class="{ board: true, empty: !chat && !selectedProfile }">
+  <div @keypress.esc="closeBoard" :class="{ board: true, empty: !chat && !selectedProfile }">
     <message-nav
       v-if="chat"
       :class="this.selectedProfile ? '' : 'closedProfile'"
     />
+    <audio-player v-if="selectedAudio && chat" :audio="selectedAudio" :class="{closedProfile: !this.selectedProfile}"/>
     <message-list
       :class="{
+        audio: selectedAudio,
         ms: !this.selectedProfile,
         'with-filles': this.withFiles,
       }"
@@ -76,8 +78,9 @@ import Echo from "laravel-echo";
 import MessageCreator from "./MessageCreator.vue";
 import MessageList from "./MessageList.vue";
 import Profile from "./Profile.vue";
+import AudioPlayer from './AudioPlayer.vue';
 export default {
-  components: { MessageList, MessageCreator, Profile, MessageNav },
+  components: { MessageList, MessageCreator, Profile, MessageNav, AudioPlayer },
   data: () => {
     return {
       messages: [],
@@ -143,6 +146,9 @@ export default {
     },
   },
   methods: {
+    closeBoard(event) {
+        this.$store.dispatch("selectChat", this.chat.id);
+    },
     showDeleteDialog(message) {
       this.deleteableMessage = message;
       this.dialog = true;
@@ -317,6 +323,9 @@ export default {
     selectedProfile: function () {
       return this.$store.getters.selectedProfile;
     },
+    selectedAudio: function(){
+      return this.$store.getters.selectedAudio
+    }
   },
 };
 </script>
@@ -367,5 +376,8 @@ export default {
   z-index: 9999;
   height: 100%;
   width: auto;
+}
+.audio{
+  top:98px
 }
 </style>

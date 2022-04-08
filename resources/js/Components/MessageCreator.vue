@@ -161,8 +161,7 @@ export default {
     },
     addFile(e) {
       if (e.target.files.length > 0) {
-        if (e.target.files[0].size < 1098304) {
-          console.log(e.target.files[0]);
+        if (e.target.files[0].size < 10485760) {
           this.attachment.push(e.target.files[0]);
           this.$emit("changeWithFiles", true);
         } else {
