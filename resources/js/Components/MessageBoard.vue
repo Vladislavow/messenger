@@ -133,6 +133,7 @@ export default {
                             status: false,
                             id: user.id,
                         });
+                        this.$store.dispatch("updateChat", user);
                     });
             })
             .catch((err) => {});

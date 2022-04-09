@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateUserAvatarRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Jobs\SendAllContacts;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -33,6 +34,8 @@ class LoginController extends Controller
         if (auth()->check()) {
             /** @var User $user  */
             $user =  auth()->user();
+            $user->online = false;
+            $user->last_seen = Carbon::now();
             $user->tokens()->delete();
             return response()->json('Logged out', 200);
         } else {

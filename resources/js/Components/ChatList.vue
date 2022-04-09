@@ -10,8 +10,12 @@
                     : "No chats started yet"
             }}
         </div>
-        <div class="loading">
+        <div v-if="loading" class="loading">
             <v-progress-circular color="white" size="50" indeterminate />
+        </div>
+        <div v-if="chats.length > 10">
+            <v-divider dark></v-divider>
+            <div class="total-chats">Total {{ chats.length }} chats</div>
         </div>
     </div>
 </template>
@@ -29,7 +33,7 @@ export default {
         getChatList() {
             this.loading = true;
             this.$store.dispatch("getChats").finally(() => {
-                this.laoding = false;
+                this.loading = false;
             });
         },
     },
@@ -103,5 +107,11 @@ var sortByDate = function (d1, d2) {
 .loading {
     margin-top: 10px;
     text-align: center;
+}
+.total-chats {
+    color: white;
+    text-align: center;
+    margin: 5px 0px;
+    font-size: 14px;
 }
 </style>
