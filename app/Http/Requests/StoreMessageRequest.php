@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\RequiredIf;
 
 class StoreMessageRequest extends FormRequest
 {
@@ -26,7 +27,7 @@ class StoreMessageRequest extends FormRequest
         return [
             'sender' => 'required|exists:users,id',
             'recipient' => 'required|exists:users,id',
-            'content' => 'required|string',
+            'content' => new RequiredIf($this->attachment == null),
         ];
     }
 }

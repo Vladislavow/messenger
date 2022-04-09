@@ -10,8 +10,8 @@
                     : "No chats started yet"
             }}
         </div>
-        <div v-if="loading" class="loading">
-            <v-progress-circular color="white" size="50" indeterminate />
+        <div class="loading">
+            <v-progress-circular v-if="loading" color="white" size="50" indeterminate />
         </div>
         <div v-if="chats.length > 10">
             <v-divider dark></v-divider>
@@ -32,7 +32,7 @@ export default {
     methods: {
         getChatList() {
             this.loading = true;
-            this.$store.dispatch("getChats").finally(() => {
+            this.$store.dispatch("getChats").finally(()=> {
                 this.loading = false;
             });
         },
@@ -66,7 +66,7 @@ var sortByDate = function (d1, d2) {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .chats {
     position: fixed;
     width: 25%;
@@ -77,6 +77,9 @@ var sortByDate = function (d1, d2) {
     overflow: scroll;
     overflow-x: hidden;
     border-right: 1px solid black;
+    @media (max-width:424px) {
+        width: 100% !important;
+    }
 }
 .chats::-webkit-scrollbar {
     width: 5px;
@@ -91,12 +94,7 @@ var sortByDate = function (d1, d2) {
     display: initial;
 }
 
-@media (max-width: 700px) {
-    .chats {
-        min-width: 14%;
-        max-width: 14%;
-    }
-}
+
 .empty {
     color: white;
     text-align: center;

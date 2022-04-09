@@ -108,10 +108,9 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .navi {
     position: fixed !important;
-    height: 8%;
     width: 25%;
     top: 0;
     left: 0;
@@ -120,14 +119,13 @@ export default {
     display: flex;
     min-height: 58px;
     border-right: 1px solid black;
-    z-index: 1000;
-}
-
-@media (max-width: 700px) {
-    .navi {
-        width: 80px;
+    /* z-index: 100; */
+    @media (max-width:424px) {
+        width: 100% !important;
     }
 }
+
+
 .search {
     margin-top: 2%;
     width: 90%;

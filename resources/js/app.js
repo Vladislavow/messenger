@@ -62,7 +62,6 @@ Axios.interceptors.response.use(
         } else if (error.response.status == 422) {
             Vue.$toast.error("Unprocessible content");
         } else {
-            console.log(error.response.data.message);
             Vue.$toast.error(error.response.data.message);
         }
         return Promise.reject(error);
