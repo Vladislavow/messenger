@@ -32,10 +32,12 @@
     >
     <audio
       ref="player"
-      :src="audio.path"
+      :src="getFile()"
       @timeupdate="changeProgress"
       @durationchange="changeDuration"
       @canplay="play(true)"
+      @ended="playing = false"
+      type="audio/ogg"
     ></audio>
   </div>
 </template>
@@ -71,18 +73,20 @@ export default {
         if (!this.player.paused) {
           this.player.pause();
         } else {
+          this.audio.src = 'blob:http://127.0.0.1:8000/c2b743c0-0f21-4127-8429-c9577b019462';
+          this.player.load();
           this.player.play();
         }
       }
       this.playing = !this.player.paused;
     },
     setProgress(value) {
-      this.player.pause()
+      this.player.pause();
       // this.player.currentTime = parseInt(100,10);
       // this.$refs.player.currentTime = 10
-      // this.player.currentTime = 10
+      this.player.currentTime = value;
       // console.log(this.player.currentTime);
-       this.player.play()
+      this.player.play();
     },
     next() {},
     close() {
@@ -93,6 +97,14 @@ export default {
     },
     changeDuration(e) {
       this.duration = parseInt(this.player?.duration, 10);
+    },
+    getFile() {
+      axios
+        .get("/api/song/" + this.audio.id, { responseType: "blob" })
+        .then((response) => {
+          console.log(URL.createObjectURL(response.data));
+          return URL.createObjectURL(response.data);
+        });
     },
     parseTime(value) {
       return (
@@ -114,7 +126,6 @@ export default {
   position: fixed;
   top: 58px;
   display: flex;
-  
 }
 .controllers {
   margin-left: 15px;
@@ -124,7 +135,6 @@ export default {
   width: 83%;
   align-items: center;
   padding: 2px;
-  max-width: 1000px;
 }
 .close-btn {
   align-self: flex-end;

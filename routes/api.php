@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Models\Attachment;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', ['as' => 'login', LoginController::class, 'login'])->name('login');
@@ -29,4 +30,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/download/{attachment}', [MessageController::class, 'downloadAttachment']);
     Route::post('/message/{message}', [MessageController::class, 'update']);
     Route::delete('/attachment/{attachment}', [MessageController::class, 'deleteAttachment']);
+    Route::get('/song/{attachment}', function(Attachment $attachment){
+        $response = new BinaryFileResponse($attachment->path);
+        BinaryFileResponse::trustXSendfileTypeHeader();
+    
+        return $response;
+    });
 });
+

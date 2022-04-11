@@ -295,6 +295,7 @@ export default {
     width: 100%;
     right: 0px;
     z-index: 999 !important;
+     background: rgba(33, 33, 33, 1);
   }
 }
 .profile::-webkit-scrollbar {

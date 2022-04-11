@@ -34,7 +34,6 @@
         @down="scrollDown"
       />
     </template>
-    
   </div>
 </template>
 
@@ -64,8 +63,8 @@ export default {
             return;
           }
           var container = document.getElementById("mes");
-          container.scrollTop = container.scrollHeight - container.clientHeight;        
-       }, 50);
+          container.scrollTop = container.scrollHeight - container.clientHeight;
+        }, 50);
     },
     showScrollThumb() {
       this.scroll_timer = null;
@@ -107,12 +106,14 @@ export default {
     },
   },
   mounted() {},
-  computed:{
-    onBottom:function(){
-       var container = document.getElementById("mes");
-      return (container.scrollHeight - container.clientHeight) == container.scrollTop;
-    }
-  }
+  computed: {
+    onBottom: function () {
+      var container = document.getElementById("mes");
+      return (
+        container.scrollHeight - container.clientHeight == container.scrollTop
+      );
+    },
+  },
 };
 </script>
 
@@ -127,9 +128,9 @@ export default {
   display: flex;
   flex-direction: column;
   top: 58px;
-
+  bottom: 108px;
   @media (min-height: 900px) {
-    height: 82% !important;
+    height: 82%;
   }
   @media (max-width: 424px) {
     width: 100% !important;

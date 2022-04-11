@@ -352,8 +352,9 @@ export default {
 .ms {
   margin-left: 12.5%;
 }
+
 .closedProfile {
-  width: 100%;
+  width: 75%;
 }
 .load {
   position: absolute;
@@ -370,7 +371,7 @@ export default {
   }
 }
 .with-filles {
-  height: 74%;
+  bottom: 122px;
 }
 .pam {
   z-index: 9999;
@@ -378,6 +379,7 @@ export default {
   width: auto;
 }
 .audio{
-  top:98px
+  top:98px;
+  height: auto;
 }
 </style>
