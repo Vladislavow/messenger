@@ -1,24 +1,16 @@
 <template>
   <div class="viewer" @click="close">
-    <v-img
+    <img
       @click.stop
       class="image"
-      contain
-      aspect-ratio="2.3"
       :src="image.path"
-      ><template v-slot:placeholder>
-        <v-row class="fill-height ma-0" align="center" justify="center">
-          <v-progress-circular
-            indeterminate
-            color="grey lighten-5"
-          ></v-progress-circular>
-        </v-row> </template
-    ></v-img>
+      >
+    <img>
     <div class="btns">
       <v-btn :loading="loading" small plain @click.stop="downloadImg" fab
         ><v-icon color="green">mdi-download</v-icon></v-btn
       >
-      <v-btn small plain @click.stop="deleteImg" fab
+      <v-btn v-if="false" small plain @click.stop="deleteImg" fab
         ><v-icon color="red">mdi-delete</v-icon></v-btn
       >
       <v-btn small plain @click="close" fab
@@ -51,10 +43,10 @@ export default {
           responseType: "blob",
         })
         .then((response) => {
-          var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+          var fileURL = window.URL.createObjectURL(new Blob([response]));
           var fileLink = document.createElement("a");
           fileLink.href = fileURL;
-          fileLink.setAttribute("download", `${file.original_name}`);
+          fileLink.setAttribute("download", `${this.image.original_name}`);
           document.body.appendChild(fileLink);
           fileLink.click();
         })
@@ -89,8 +81,14 @@ export default {
   padding: 5%;
   width: 100%;
   height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-
+.image{
+    max-height: 97%;
+    max-width: 97%;
+}
 .btns {
   position: absolute;
   right: 15px;

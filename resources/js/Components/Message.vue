@@ -10,7 +10,7 @@
       <div v-if="message.attachments.length > 0">
         <div v-for="(file, index) in message.attachments" :key="index">
           <div class="player" v-if="audioExtensions.includes(file.extension)">
-            <v-btn dark fab x-small @click="selectAudio(file)">
+            <v-btn dark depressed fab x-small @click="selectAudio(file)">
               <v-icon>mdi-play</v-icon>
             </v-btn>
             <div class="audio_title">{{ file.original_name }}</div>

@@ -21,9 +21,52 @@
         :max="duration"
         hide-details
         @change="setProgress"
-      ></v-slider>
+        thumb-label
+        @mousedown="player.pause()"
+        @mouseup="player.play()"        
+      >
+        <template v-slot:thumb-label="{ value }">
+          {{ parseTime(value) }}
+        </template>
+      </v-slider>
     </div>
+    <v-menu
+      dark
+      open-on-hover
+      bottom
+      offset-y
+      :close-on-click="false"
+      :close-on-content-click="false"
+      rounded
+    >
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+          v-if="player"
+          v-bind="attrs"
+          v-on="on"
+          small
+          fab
+          plain
+          @click.prevent="changeMute"
+          ><v-icon color="white">{{
+            player.muted ? "mdi-volume-off" : "mdi-volume-high"
+          }}</v-icon></v-btn
+        >
+      </template>
+      <div class="volume-container">
+        <v-slider
+          class="volume"
+          v-if="player"
+          @change="player.muted = false"
+          v-model="player.volume"
+          max="1"
+          step="0.1"
+          hide-details
+        ></v-slider>
 
+        {{ player ? player.volume * 100 + "%" : "" }}
+      </div>
+    </v-menu>
     <div class="time">
       {{ parseTime(progress) + "/" + parseTime(duration) }}
     </div>
@@ -37,6 +80,7 @@
       @canplay="play(true)"
       @ended="playing = false"
       type="audio/ogg"
+      @volumechange="handleVolume"
     ></audio>
   </div>
 </template>
@@ -51,24 +95,28 @@ export default {
       duration: 0,
     };
   },
-  watch:{
-    audio: function(value){
-      if(value.path!=null){
-          this.getFile(value.id);
+  watch: {
+    audio: function (value) {
+      if (value.path != null) {
+        this.getFile(value.id);
       }
-    }
+    },
   },
   mounted() {
     let player = this.$refs.player;
     if (player) {
       this.player = player;
       this.playing = !this.player.paused;
-      if(this.audio){
-        this.getFile(this.audio.id)
+      if (this.audio) {
+        this.getFile(this.audio.id);
       }
     }
   },
   methods: {
+    changeMute() {
+      this.player.muted = !this.player.muted;
+    },
+    handleVolume(e) {},
     previous() {
       if (this.progress > 0) {
         this.player.currentTime = 0;
@@ -81,8 +129,6 @@ export default {
         if (!this.player.paused) {
           this.player.pause();
         } else {
-          this.audio.src = 'blob:http://127.0.0.1:8000/c2b743c0-0f21-4127-8429-c9577b019462';
-          this.player.load();
           this.player.play();
         }
       }
@@ -107,28 +153,29 @@ export default {
       axios
         .get("/api/song/" + value, { responseType: "blob" })
         .then((response) => {
-          let url = URL.createObjectURL(response.data)
+          let url = URL.createObjectURL(response.data);
           this.player.src = url;
         });
     },
     parseTime(value) {
       return (
-        Math.trunc(value / 60) +
+        ("0" + Math.trunc(value / 60)).slice(-2) +
         ":" +
-        String((value / 60).toFixed(2)).split(".")[1]
+        ("0" + (value % 60)).slice(-2)
       );
     },
   },
   computed: {
-    audio: function(){
+    audio: function () {
       return this.$store.getters.selectedAudio;
-    }
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
 .player {
+  z-index: 1000;
   width: 50%;
   height: 40px;
   background: rgba(33, 33, 33, 0.9);
@@ -151,5 +198,14 @@ export default {
 .time {
   color: white;
   align-self: center;
+}
+.volume {
+  min-width: 100px;
+}
+.volume-container{
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>
