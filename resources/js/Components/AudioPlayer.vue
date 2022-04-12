@@ -32,7 +32,6 @@
     >
     <audio
       ref="player"
-      :src="getFile()"
       @timeupdate="changeProgress"
       @durationchange="changeDuration"
       @canplay="play(true)"
@@ -44,7 +43,6 @@
 
 <script>
 export default {
-  props: ["audio"],
   data() {
     return {
       player: null,
@@ -53,11 +51,21 @@ export default {
       duration: 0,
     };
   },
+  watch:{
+    audio: function(value){
+      if(value.path!=null){
+          this.getFile(value.id);
+      }
+    }
+  },
   mounted() {
     let player = this.$refs.player;
     if (player) {
       this.player = player;
       this.playing = !this.player.paused;
+      if(this.audio){
+        this.getFile(this.audio.id)
+      }
     }
   },
   methods: {
@@ -82,10 +90,7 @@ export default {
     },
     setProgress(value) {
       this.player.pause();
-      // this.player.currentTime = parseInt(100,10);
-      // this.$refs.player.currentTime = 10
       this.player.currentTime = value;
-      // console.log(this.player.currentTime);
       this.player.play();
     },
     next() {},
@@ -98,12 +103,12 @@ export default {
     changeDuration(e) {
       this.duration = parseInt(this.player?.duration, 10);
     },
-    getFile() {
+    getFile(value) {
       axios
-        .get("/api/song/" + this.audio.id, { responseType: "blob" })
+        .get("/api/song/" + value, { responseType: "blob" })
         .then((response) => {
-          console.log(URL.createObjectURL(response.data));
-          return URL.createObjectURL(response.data);
+          let url = URL.createObjectURL(response.data)
+          this.player.src = url;
         });
     },
     parseTime(value) {
@@ -114,7 +119,11 @@ export default {
       );
     },
   },
-  computed: {},
+  computed: {
+    audio: function(){
+      return this.$store.getters.selectedAudio;
+    }
+  },
 };
 </script>
 

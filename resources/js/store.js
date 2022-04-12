@@ -14,7 +14,8 @@ export default new Vuex.Store({
         search: false,
         searchedChats: null,
         updateMessage: null,
-        selectedAudio:null
+        selectedAudio:null,
+        selectedImage:null
     },
     mutations: {
         auth_request(state) {
@@ -136,6 +137,9 @@ export default new Vuex.Store({
         },
         set_audio(state, audio){
             state.selectedAudio = audio;
+        },
+        set_image(state, image){
+            state.selectedImage = image;
         }
     },
     actions: {
@@ -256,6 +260,9 @@ export default new Vuex.Store({
         },
         changeSelectedAudio({commit}, audio){
             commit('set_audio' , audio);
+        },
+        changeSelectedImage({commit}, image){
+            commit('set_image' , image);
         }
     },
     getters: {
@@ -275,5 +282,6 @@ export default new Vuex.Store({
         searchedChats: (state) => state.searchedChats,
         updateMessage: (state) => state.updateMessage,
         selectedAudio: (state) =>state.selectedAudio,
+        selectedImage: (state) =>state.selectedImage,
     },
 });

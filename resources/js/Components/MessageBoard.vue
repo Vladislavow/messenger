@@ -4,7 +4,7 @@
       v-if="chat"
       :class="this.selectedProfile ? '' : 'closedProfile'"
     />
-    <audio-player v-if="selectedAudio && chat" :audio="selectedAudio" :class="{closedProfile: !this.selectedProfile}"/>
+    <audio-player v-if="selectedAudio && chat" :class="{closedProfile: !this.selectedProfile}"/>
     <message-list
       :class="{
         audio: selectedAudio,
@@ -355,6 +355,9 @@ export default {
 
 .closedProfile {
   width: 75%;
+  @media (max-width:600px) {
+    width:100%
+  }
 }
 .load {
   position: absolute;

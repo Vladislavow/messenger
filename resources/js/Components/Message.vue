@@ -9,16 +9,14 @@
     <div class="content">
       <div v-if="message.attachments.length > 0">
         <div v-for="(file, index) in message.attachments" :key="index">
-          <div
-            class="player"
-            v-if="audioExtensions.includes(file.extension)"
-          >
-          <v-btn dark fab x-small @click="selectAudio(file)"> 
-            <v-icon>mdi-play</v-icon>
-          </v-btn>
-          <div class="audio_title">{{ file.original_name }}</div>
+          <div class="player" v-if="audioExtensions.includes(file.extension)">
+            <v-btn dark fab x-small @click="selectAudio(file)">
+              <v-icon>mdi-play</v-icon>
+            </v-btn>
+            <div class="audio_title">{{ file.original_name }}</div>
           </div>
           <v-img
+            @click="selectImage(file)"
             class="img-file"
             v-if="imgExtensions.includes(file.extension)"
             :key="index"
@@ -107,9 +105,7 @@ export default {
     };
   },
   props: ["message", "userId"],
-  mounted() {
-
-  },
+  mounted() {},
   methods: {
     scrollDown(e) {
       this.$emit("down");
@@ -134,8 +130,11 @@ export default {
     deleteMessage() {
       this.$emit("deleteMessage", this.message);
     },
-    selectAudio(file){
-      this.$store.dispatch('changeSelectedAudio', file)
+    selectAudio(file) {
+      this.$store.dispatch("changeSelectedAudio", file);
+    },
+    selectImage(file) {
+      this.$store.dispatch("changeSelectedImage", file);
     },
     download(file) {
       this.loading = true;
@@ -262,6 +261,7 @@ export default {
 .img-file {
   border-radius: 15px;
   margin-top: 5px;
+  background: white;
 }
 .img-file:hover .img-downolad {
   display: inline-block !important;
@@ -277,11 +277,11 @@ export default {
 .delete {
   color: red;
 }
-.player{
-  display:flex;
+.player {
+  display: flex;
   align-items: center;
 }
-.audio_title{
+.audio_title {
   margin-left: 10px;
 }
 </style>

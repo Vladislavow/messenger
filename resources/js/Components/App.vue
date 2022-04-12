@@ -3,6 +3,7 @@
         <navbar />
         <chat-list />
         <message-board />
+        <image-viewer v-if="this.$store.getters.selectedImage" />
     </div>
 </template>
 
@@ -11,8 +12,9 @@ import MessageBoard from "./MessageBoard.vue";
 import ChatList from "./ChatList.vue";
 import Navbar from "./Navbar.vue";
 import Echo from "laravel-echo";
+import ImageViewer from './ImageViewer.vue';
 export default {
-    components: { MessageBoard, ChatList, Navbar },
+    components: { MessageBoard, ChatList, Navbar, ImageViewer },
     data: () => {
         return {};
     },
