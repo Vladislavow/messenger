@@ -1,11 +1,10 @@
 <template>
   <div class="viewer" @click="close">
-    <img
-      @click.stop
-      class="image"
-      :src="image.path"
-      >
-    <img>
+    <div class="img-title" v-if="image.original_name">
+      {{ image.original_name }}
+    </div>
+    <img @click.stop class="image" :src="image.path" />
+    <img />
     <div class="btns">
       <v-btn :loading="loading" small plain @click.stop="downloadImg" fab
         ><v-icon color="green">mdi-download</v-icon></v-btn
@@ -85,9 +84,9 @@ export default {
   justify-content: center;
   align-items: center;
 }
-.image{
-    max-height: 97%;
-    max-width: 97%;
+.image {
+  max-height: 97%;
+  max-width: 97%;
 }
 .btns {
   position: absolute;
@@ -95,5 +94,13 @@ export default {
   top: 15px;
   display: flex;
   align-items: center;
+}
+.img-title {
+  color: white;
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  height:40px;
+  padding-top: 5px;
 }
 </style>

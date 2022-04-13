@@ -23,7 +23,13 @@
       Load more
     </v-btn>
     <template class="messages" v-for="(message, index) in this.messages">
-      <div v-if="checkDate(message.created_at, index)" class="date">
+      <div
+        :id="'date' + index"
+        :ref="'date' + index"
+        v-if="checkDate(message.created_at, index)"
+        @click="scrollToBefore(index)"
+        class="date"
+      >
         {{ dates.get(index) }}
       </div>
       <message
@@ -53,8 +59,27 @@ export default {
     messages: function (value) {
       this.scrollDown();
     },
+    chat: function (value) {
+      this.dates = new Map();
+    },
   },
   methods: {
+    scrollToBefore(index) {
+      let previous = null;
+      this.dates.forEach(function (value, key) {
+        console.log(key + " " + index + " " + previous);
+        if (key == index) {
+          console.log("curr" + key);
+          if (previous || previous == 0) {
+            console.log("prev" + previous);
+            var element = document.getElementById("date" + previous);
+            element.scrollIntoView({behavior: "smooth"});
+          }
+        } else {
+          previous = key;
+        }
+      });
+    },
     scrollDown() {
       if (this.scroll_timer == null)
         setTimeout(() => {
@@ -91,19 +116,15 @@ export default {
           return true;
         }
       }
+      this.checkForUnique()
     },
-    async openSimpleSlide(index) {
-      let prev = -1;
-      for (let key of this.dates.keys()) {
-        if (key == index) {
-          break;
-        }
-        prev = key;
+    checkForUnique(){
+      let unique = new Set(this.dates.values());
+      console.log();
+      if(unique.size != this.dates.size){
+        this.dates = new Map()
       }
-      let slide = this.$refs[`date-0`];
-      let top = window.scrollY + slide.getBoundingClientRect().y;
-      window.scrollTo(0, top);
-    },
+    }
   },
   mounted() {},
   computed: {
@@ -112,6 +133,9 @@ export default {
       return (
         container.scrollHeight - container.clientHeight == container.scrollTop
       );
+    },
+    chat() {
+      return this.$store.getters.selectedChat;
     },
   },
 };
@@ -167,6 +191,7 @@ export default {
   width: 150px;
   border-radius: 35%;
   border: 2px solid white;
+  cursor: pointer;
   margin: 5px 0px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 16px;
