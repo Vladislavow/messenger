@@ -105,12 +105,12 @@ export default {
       this.$emit("getMessages");
     },
     checkDate(date, index) {
-      let current = new Date(date).toDateString();
+      let current = new Date(date.replace(" ", "T")).toDateString();
       if (index == 0) {
         this.dates.set(index, current);
         return true;
       } else {
-        let prev = new Date(this.messages[index - 1].created_at).toDateString();
+        let prev = new Date(this.messages[index - 1].created_at.replace(" ", "T")).toDateString();
         if (prev != current) {
           this.dates.set(index, current);
           return true;
