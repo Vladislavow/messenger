@@ -16,7 +16,7 @@ export default new Vuex.Store({
         updateMessage: null,
         selectedAudio: null,
         selectedImage: null,
-        selectedTheme: localStorage.getItem("theme"),
+        selectedTheme: localStorage.getItem("theme") ? localStorage.getItem("theme") : 'animated',
     },
     mutations: {
         auth_request(state) {
