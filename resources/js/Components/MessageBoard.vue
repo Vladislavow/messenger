@@ -42,7 +42,7 @@
     </v-progress-circular>
     <img
       class="pam"
-      src="images/animated_back.svg"
+      :src="`images/${theme}_back.svg`"
       alt="Kiwi standing on oval"
     />
     <v-dialog
@@ -325,7 +325,10 @@ export default {
     },
     selectedAudio: function(){
       return this.$store.getters.selectedAudio
-    }
+    },
+    theme: function(){
+      return this.$store.getters.selectedTheme
+    },
   },
 };
 </script>
@@ -379,6 +382,7 @@ export default {
 .pam {
   z-index: 9999;
   height: 100%;
+  width: 75%;
   width: auto;
 }
 .audio{

@@ -47,7 +47,7 @@
         rows="2"
         rounded
         dark
-        @keyup.enter="keysHandling"
+        @keypress.enter="keysHandling"
       >
         <template v-if="updateMessage != null" v-slot:prepend>
           <v-icon @click="closeUpdate"> mdi-pencil-remove </v-icon>
@@ -65,7 +65,6 @@
           </v-icon>
         </template></v-textarea
       >
-
       <input type="file" hidden ref="file" @change="addFile" />
       <v-btn :loading="this.loading" fab dark @click="send">
         <v-icon color="white">{{
@@ -152,10 +151,10 @@ export default {
       }
     },
     keysHandling(event) {
-      event.preventDefault();
       if (event.shiftKey === true && event.key === "Enter") {
         return;
       }
+      event.preventDefault();
       this.send();
       return false;
     },

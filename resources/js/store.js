@@ -14,8 +14,9 @@ export default new Vuex.Store({
         search: false,
         searchedChats: null,
         updateMessage: null,
-        selectedAudio:null,
-        selectedImage:null
+        selectedAudio: null,
+        selectedImage: null,
+        selectedTheme: localStorage.getItem("theme"),
     },
     mutations: {
         auth_request(state) {
@@ -44,18 +45,18 @@ export default new Vuex.Store({
             if (state.selectedChat == null || state.selectedChat != value) {
                 var chat =
                     state.chats[
-                        state.chats.indexOf(
-                            state.chats.find((chat) => chat.id == value)
-                        )
+                    state.chats.indexOf(
+                        state.chats.find((chat) => chat.id == value)
+                    )
                     ];
                 if (state.search && !chat) {
                     state.chats.push(
                         state.searchedChats[
-                            state.searchedChats.indexOf(
-                                state.searchedChats.find(
-                                    (schat) => schat.id == value
-                                )
+                        state.searchedChats.indexOf(
+                            state.searchedChats.find(
+                                (schat) => schat.id == value
                             )
+                        )
                         ]
                     );
                     state.search = false;
@@ -98,9 +99,9 @@ export default new Vuex.Store({
             } else {
                 let selected_chat =
                     state.chats[
-                        state.chats.indexOf(
-                            state.chats.find((chat_a) => chat_a.id == chat.id)
-                        )
+                    state.chats.indexOf(
+                        state.chats.find((chat_a) => chat_a.id == chat.id)
+                    )
                     ];
                 selected_chat.unread = selected_chat.unread
                     ? selected_chat.unread + 1
@@ -110,9 +111,9 @@ export default new Vuex.Store({
         update_chat(state, chat) {
             state.chats.splice(
                 state.chats[
-                    state.chats.indexOf(
-                        state.chats.find((chat_a) => chat_a.id == chat.id)
-                    )
+                state.chats.indexOf(
+                    state.chats.find((chat_a) => chat_a.id == chat.id)
+                )
                 ],
                 1
             );
@@ -126,20 +127,24 @@ export default new Vuex.Store({
             ].last_message.read = true;
         },
         set_status(state, data) {
-            state.chats[
-                state.chats.indexOf(
-                    state.chats.find((user) => user.id == data.id)
-                )
-            ].online = data.status;
+            let chat_index = state.chats.indexOf(
+                state.chats.find((user) => user.id == data.id)
+            );
+            state.chats[chat_index].online = data.status;
+            state.chats[chat_index].last_seen = data.last_seen
         },
         set_update_message(state, message) {
             state.updateMessage = message;
         },
-        set_audio(state, audio){
+        set_audio(state, audio) {
             state.selectedAudio = audio;
         },
-        set_image(state, image){
+        set_image(state, image) {
             state.selectedImage = image;
+        },
+        set_theme(state, theme) {
+            localStorage.setItem('theme', theme)
+            state.selectedTheme = theme
         }
     },
     actions: {
@@ -253,17 +258,23 @@ export default new Vuex.Store({
             commit("set_last_message_as_read", chat);
         },
         changeOnlineStatus({ commit }, data) {
-            commit("set_status", data);
+            axios.get('/api/chat/' + data.id).then(resp => {
+                data.last_seen = resp.data.last_seen;
+                commit("set_status", data);
+            });
         },
         changeUpdateMessage({ commit }, message) {
             commit("set_update_message", message);
         },
-        changeSelectedAudio({commit}, audio){
-            commit('set_audio' , audio);
+        changeSelectedAudio({ commit }, audio) {
+            commit('set_audio', audio);
         },
-        changeSelectedImage({commit}, image){
-            commit('set_image' , image);
-        }
+        changeSelectedImage({ commit }, image) {
+            commit('set_image', image);
+        },
+        changeSelectedTheme({ commit }, theme) {
+            commit('set_theme', theme);
+        },
     },
     getters: {
         isLoggedIn: (state) => !!state.token,
@@ -274,14 +285,15 @@ export default new Vuex.Store({
         selectedProfile: (state) => state.selectedProfile,
         selectedChatInfo: (state) =>
             state.chats[
-                state.chats.indexOf(
-                    state.chats.find((chat) => chat.id == state.selectedChat)
-                )
+            state.chats.indexOf(
+                state.chats.find((chat) => chat.id == state.selectedChat)
+            )
             ],
         search: (state) => state.search,
         searchedChats: (state) => state.searchedChats,
         updateMessage: (state) => state.updateMessage,
-        selectedAudio: (state) =>state.selectedAudio,
-        selectedImage: (state) =>state.selectedImage,
+        selectedAudio: (state) => state.selectedAudio,
+        selectedImage: (state) => state.selectedImage,
+        selectedTheme: (state) => state.selectedTheme,
     },
 });

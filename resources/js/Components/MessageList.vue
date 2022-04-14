@@ -65,15 +65,13 @@ export default {
   },
   methods: {
     scrollToBefore(index) {
+      this.sortDates();
       let previous = null;
       this.dates.forEach(function (value, key) {
-        console.log(key + " " + index + " " + previous);
         if (key == index) {
-          console.log("curr" + key);
           if (previous || previous == 0) {
-            console.log("prev" + previous);
             var element = document.getElementById("date" + previous);
-            element.scrollIntoView({behavior: "smooth"});
+            element.scrollIntoView({ behavior: "smooth" });
           }
         } else {
           previous = key;
@@ -110,21 +108,32 @@ export default {
         this.dates.set(index, current);
         return true;
       } else {
-        let prev = new Date(this.messages[index - 1].created_at.replace(" ", "T")).toDateString();
+        let prev = new Date(
+          this.messages[index - 1].created_at.replace(" ", "T")
+        ).toDateString();
         if (prev != current) {
           this.dates.set(index, current);
           return true;
         }
       }
-      this.checkForUnique()
+      this.checkForUnique();
     },
-    checkForUnique(){
+    sortDates() {
+      var temp = new Map(
+        [...this.dates.entries()].sort((a, b) => {
+          if (a[0] > b[0]) return 1;
+          if (a[0] == b[0]) return 0;
+          if (a[0] < b[0]) return -1;
+        })
+      );
+      this.dates = temp;
+    },
+    checkForUnique() {
       let unique = new Set(this.dates.values());
-      console.log();
-      if(unique.size != this.dates.size){
-        this.dates = new Map()
+      if (unique.size != this.dates.size) {
+        this.dates = new Map();
       }
-    }
+    },
   },
   mounted() {},
   computed: {

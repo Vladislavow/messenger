@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -59,6 +60,11 @@ class User extends Authenticatable
         'last_seen' => 'datetime:Y-m-d h:i:s',
         'online' => 'boolean'
     ];
+
+    public function getLastSeentAttribute($value)
+    {
+        return Carbon::parse($value)->timezone('Europe/Kiev')->toDateTimeString();
+    }
 
     public function setPasswordAttribute($password)
     {

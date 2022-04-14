@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Attribute;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -19,6 +20,11 @@ class Message extends Model
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:i:s'
     ];
+
+    public function getCreatedAtAttribute($value)
+    {
+        return Carbon::parse($value)->timezone('Europe/Kiev')->toDateTimeString();
+    }
 
     public function attachments()
     {

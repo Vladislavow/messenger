@@ -40,6 +40,10 @@ router.beforeEach((to, from, next) => {
 });
 Vue.use(VueRouter);
 Vue.prototype.$http = Axios;
+const theme = localStorage.getItem("theme");
+if (!theme) {
+    localStorage.setItem('theme', 'animated');
+}
 const token = localStorage.getItem("token");
 if (token) {
     Vue.prototype.$http.defaults.headers.common[
