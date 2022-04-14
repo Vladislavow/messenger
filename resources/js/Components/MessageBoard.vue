@@ -1,11 +1,18 @@
 <template>
-  <div @keypress.esc="closeBoard" :class="{ board: true, empty: !chat && !selectedProfile }">
+  <div
+    @keypress.esc="closeBoard"
+    :class="{ board: true, empty: !chat && !selectedProfile }"
+  >
     <message-nav
       v-if="chat"
       :class="this.selectedProfile ? '' : 'closedProfile'"
     />
-    <audio-player v-if="selectedAudio && chat" :class="{closedProfile: !this.selectedProfile}"/>
+    <audio-player
+      v-if="selectedAudio && chat"
+      :class="{ closedProfile: !this.selectedProfile }"
+    />
     <message-list
+      ref="messageList"
       :class="{
         audio: selectedAudio,
         ms: !this.selectedProfile,
@@ -78,7 +85,7 @@ import Echo from "laravel-echo";
 import MessageCreator from "./MessageCreator.vue";
 import MessageList from "./MessageList.vue";
 import Profile from "./Profile.vue";
-import AudioPlayer from './AudioPlayer.vue';
+import AudioPlayer from "./AudioPlayer.vue";
 export default {
   components: { MessageList, MessageCreator, Profile, MessageNav, AudioPlayer },
   data: () => {
@@ -147,7 +154,7 @@ export default {
   },
   methods: {
     closeBoard(event) {
-        this.$store.dispatch("selectChat", this.chat.id);
+      this.$store.dispatch("selectChat", this.chat.id);
     },
     showDeleteDialog(message) {
       this.deleteableMessage = message;
@@ -277,8 +284,31 @@ export default {
         message: message,
       });
     },
+    makeTempId(length) {
+      var result = "";
+      var characters =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      var charactersLength = characters.length;
+      for (var i = 0; i < length; i++) {
+        result += characters.charAt(
+          Math.floor(Math.random() * charactersLength)
+        );
+      }
+      return result;
+    },
     send(text, attachment) {
-      this.loading = true;
+      // this.loading = true;
+      var tempId = this.makeTempId(5);
+      let message = {
+        content: text,
+        attachments: [],
+        created_at: "sending",
+        read: 0,
+        sender: this.userId,
+        recipient: this.chat,
+        tempId: tempId,
+      };
+      this.messages.push(message);
       const config = { "content-type": "multipart/form-data" };
       const formData = new FormData();
       formData.append("content", text);
@@ -290,7 +320,12 @@ export default {
       axios
         .post("/api/chats/messages", formData, config)
         .then((resp) => {
-          this.messages.push(resp.data);
+          this.messages[
+            this.messages.indexOf(
+              this.messages.find((tempMessage) => tempMessage.tempId == tempId)
+            )
+          ] = resp.data;
+          this.$refs.messageList.scrollDown();
           this.$store.dispatch("setLastMessage", {
             sender: resp.data.recipient,
             message: resp.data,
@@ -323,11 +358,11 @@ export default {
     selectedProfile: function () {
       return this.$store.getters.selectedProfile;
     },
-    selectedAudio: function(){
-      return this.$store.getters.selectedAudio
+    selectedAudio: function () {
+      return this.$store.getters.selectedAudio;
     },
-    theme: function(){
-      return this.$store.getters.selectedTheme
+    theme: function () {
+      return this.$store.getters.selectedTheme;
     },
   },
 };
@@ -358,8 +393,8 @@ export default {
 
 .closedProfile {
   width: 75%;
-  @media (max-width:600px) {
-    width:100%
+  @media (max-width: 600px) {
+    width: 100%;
   }
 }
 .load {
@@ -385,8 +420,8 @@ export default {
   width: 75%;
   width: auto;
 }
-.audio{
-  top:98px;
+.audio {
+  top: 98px;
   height: auto;
 }
 </style>

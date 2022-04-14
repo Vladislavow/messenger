@@ -60,8 +60,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.setings {
-}
 .s-title {
   display: flex;
   justify-content: left;
@@ -82,8 +80,5 @@ export default {
   border-radius: 10px;
   margin: 2px;
   align-items: center;
-}
-.sets-items *:hover {
-  //   background: rgb(77, 73, 73);
 }
 </style>

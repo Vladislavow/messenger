@@ -66,7 +66,7 @@
         </template></v-textarea
       >
       <input type="file" hidden ref="file" @change="addFile" />
-      <v-btn :loading="this.loading" fab dark @click="send">
+      <v-btn :disabled="!content && attachment.length ==0" :loading="this.loading" fab dark @click="send">
         <v-icon color="white">{{
           updateMessage != null ? "mdi-pencil" : "mdi-send"
         }}</v-icon>

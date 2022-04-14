@@ -34,7 +34,7 @@ class MessageController extends Controller
         })->orWhere(function ($query) use ($id, $user) {
             $query->where('recipient', $user->id);
             $query->where('sender', $id);
-        })->orderBy('created_at', 'desc')->paginate(20);
+        })->orderBy('id', 'desc')->paginate(20);
         return response()->json($messages);
     }
 

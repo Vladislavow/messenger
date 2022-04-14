@@ -67,7 +67,10 @@
       </div>
       <span class="text">{{ message.content }}</span>
       <div class="statuses">
-        <span class="time">
+        <span v-if="message.created_at && message.created_at == 'sending'" class="time">
+         <v-icon small>mdi-clock-outline</v-icon>
+        </span>
+        <span v-if="message.created_at && message.created_at != 'sending'" class="time">
           {{ message.created_at | moment("timezone", "Europe/Kiev", "hh:mm") }}
         </span>
         <span class="read">

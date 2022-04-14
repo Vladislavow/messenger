@@ -103,6 +103,9 @@ export default {
       this.$emit("getMessages");
     },
     checkDate(date, index) {
+      if(date == 'sending'){
+        return false;
+      }
       let current = new Date(date.replace(" ", "T")).toDateString();
       if (index == 0) {
         this.dates.set(index, current);
