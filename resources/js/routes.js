@@ -25,6 +25,10 @@ export default {
             path:'/register',
             name:'register',
             component: Register
+        },
+        {
+            path:'*',
+            redirect: '/'
         }
         
     ]

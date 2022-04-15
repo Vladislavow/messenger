@@ -6,7 +6,7 @@
     id="mes"
   >
     <infinite-loading
-      v-if="loading ==false && (messages.length > 0 && page < totalPages + 1)"
+      v-if="loading == false && messages.length > 0 && page < totalPages + 1"
       @infinite="getMessages"
       direction="top"
       spinner="spiral"
@@ -50,6 +50,7 @@ export default {
       scrollLock: false,
       dates: new Map(),
       scroll_timer: null,
+      lst_message:null,
     };
   },
   components: { Message },
@@ -62,13 +63,10 @@ export default {
       this.dates = new Map();
     },
     loading: function (value) {
-      if (value == true) {
-        console.log('so');
-        console.log(this.$refs.infinite)
-        this.$refs.infinite.$data.status = 0
+      if (value == true && this.messages.length > 20) {
+        this.$refs.infinite.$data.status = 0;
         var container = document.getElementById("mes");
-          container.scrollTop = 300;
-        // this.$refs.infinite.$state.loaded()
+        container.scrollTop = 500;
       }
     },
   },
@@ -108,11 +106,9 @@ export default {
       this.$emit("deleteMessage", message);
     },
     getMessages($state) {
-      console.log("ty");
       this.scrollLock = true;
       this.$emit("getMessages");
-      console.log();
-     $state.loaded()
+      $state.loaded();
     },
     checkDate(date, index) {
       if (date == "sending") {
@@ -166,6 +162,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.mes{
+  display: flex;
+  align-items: flex-end;
+}
 .messages {
   position: fixed;
   width: 50%;

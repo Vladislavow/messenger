@@ -17,7 +17,7 @@
       </div>
       <div class="sessions">
         <v-icon color="white">mdi-cellphone-link</v-icon> Current sessions:
-        <v-btn @click="getActiveSessions" fab plain
+        <v-btn @click="getActiveSessions" dark fab small plain :loading="loading"
           ><v-icon color="white">mdi-reload</v-icon></v-btn
         >
         <div
@@ -90,6 +90,7 @@ export default {
       currentSessionId: null,
       dialog: false,
       selectedForClose: null,
+      loading: false,
     };
   },
   watch: {
@@ -122,8 +123,11 @@ export default {
         });
     },
     getActiveSessions() {
+      this.sessions = null;
+      this.loading = true;
       axios.get("/api/sessions").then((resp) => {
         this.sessions = resp.data;
+        this.loading = false;
       });
     },
     getCurrentSession() {
@@ -181,7 +185,7 @@ export default {
 .exit-icon {
   right: 15px;
 }
-.current{
+.current {
   background: rgb(33, 150, 33);
 }
 </style>

@@ -24,15 +24,16 @@
         :src="this.chat.avatar"
         max-height="40%"
         max-width="40%"
+        @click="showImage"
       >
         <template>
           <v-row class="fill-height ma-0" align="center" justify="center">
             <v-icon
               v-if="canUpdate"
-              @click.prevent="$refs.file.click()"
+              @click.stop="$refs.file.click()"
               large
               class="edit-avatar"
-              color="white"
+              color="gold"
             >
               mdi-camera</v-icon
             >
@@ -58,7 +59,7 @@
       </div>
       <div class="canCopy" @click="copyToClipbioard(chat.email)">
         <v-icon dark>mdi-email-outline</v-icon
-        ><a :href="`mailto:`+chat.email">{{ " " + chat.email }} </a>
+        ><a :href="`mailto:` + chat.email">{{ " " + chat.email }} </a>
       </div>
       <div class="canCopy" @click="copyToClipbioard(chat.phone)">
         <v-icon dark>mdi-phone-outline</v-icon>{{ " " + chat.phone }}
@@ -215,6 +216,12 @@ export default {
     this.getChat();
   },
   methods: {
+    showImage(e) {
+      this.$store.dispatch("changeSelectedImage", {
+        name: this.chat.nickname + "-avatar",
+        path: this.chat.avatar,
+      });
+    },
     save(date) {
       this.$refs.menu.save(date);
     },
@@ -370,9 +377,8 @@ export default {
 .canCopy {
   cursor: pointer;
 }
-a{
-text-decoration: none;
-color: white !important;
+a {
+  text-decoration: none;
+  color: white !important;
 }
-
 </style>

@@ -64,12 +64,18 @@
           </div>
         </div>
       </div>
-      <span class="text">{{ message.content }}</span>
+      <span class="text" v-html='$sanitize(message.content)' v-linkified></span>
       <div class="statuses">
-        <span v-if="message.created_at && message.created_at == 'sending'" class="time">
-         <v-icon small>mdi-clock-outline</v-icon>
+        <span
+          v-if="message.created_at && message.created_at == 'sending'"
+          class="time"
+        >
+          <v-icon small>mdi-clock-outline</v-icon>
         </span>
-        <span v-if="message.created_at && message.created_at != 'sending'" class="time">
+        <span
+          v-if="message.created_at && message.created_at != 'sending'"
+          class="time"
+        >
           {{ message.created_at | moment("timezone", "Europe/Kiev", "hh:mm") }}
         </span>
         <span class="read">
@@ -79,7 +85,14 @@
         </span>
       </div>
     </div>
-    <v-menu v-if="message.created_at && message.created_at !='sending'" dark v-model="showMenu" :position-x="x" :position-y="y" offset-y>
+    <v-menu
+      v-if="message.created_at && message.created_at != 'sending'"
+      dark
+      v-model="showMenu"
+      :position-x="x"
+      :position-y="y"
+      offset-y
+    >
       <v-list>
         <div @mouseleave="hide">
           <v-list-item @click="updateMessage"
@@ -109,6 +122,16 @@ export default {
   props: ["message", "userId"],
   mounted() {},
   methods: {
+    handleLinks() {
+      var expression =
+        /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~@:%]*)*(#[\w\-]*)?(\?[^\s]*)?/gi;
+      var regex = new RegExp(expression);
+      if (this.message.content) {
+        const link = this.message.content.match(expression);
+       return this.message.content.replace(link, `<a href="${link}">${link}</a>`);
+      }
+      return  this.message.content;
+    },
     scrollDown(e) {
       this.$emit("down");
     },

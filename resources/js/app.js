@@ -15,6 +15,10 @@ import Toast, { POSITION } from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import VueMoment from "vue-moment";
 import moment from "moment-timezone";
+import linkify from 'vue-linkify'
+import sanitizeHTML from 'sanitize-html';
+Vue.prototype.$sanitize = sanitizeHTML
+Vue.directive('linkified', linkify)
 
 moment.tz.setDefault("Europe/Kiev");
 Vue.use(VueMoment, {

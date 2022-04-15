@@ -38,16 +38,20 @@
         :emojiPickerDisabled="loading"
       ></twemoji-picker>
       <v-textarea
-        class="text"
+        :class="{ text: true, drag: drag }"
         no-resize
         filled
-        placeholder="Message here"
+        :placeholder="drag ? 'Drop here' : 'Message here'"
         v-model="content"
         clearable
         rows="2"
-        rounded
+        :rounded="!drag"
         dark
+        @drop="drop"
+        @dragenter="drag = true"
+        @dragleave="drag = false"
         @keypress.enter="keysHandling"
+        hide-details
       >
         <template v-if="updateMessage != null" v-slot:prepend>
           <v-icon @click="closeUpdate"> mdi-pencil-remove </v-icon>
@@ -66,7 +70,13 @@
         </template></v-textarea
       >
       <input type="file" hidden ref="file" @change="addFile" />
-      <v-btn :disabled="!content && attachment.length ==0" :loading="this.loading" fab dark @click="send">
+      <v-btn
+        :disabled="!content && attachment.length == 0"
+        :loading="this.loading"
+        fab
+        dark
+        @click="send"
+      >
         <v-icon color="white">{{
           updateMessage != null ? "mdi-pencil" : "mdi-send"
         }}</v-icon>
@@ -119,6 +129,7 @@ export default {
         file: null,
         index: null,
       },
+      drag: false,
     };
   },
   watch: {
@@ -131,6 +142,24 @@ export default {
     },
   },
   methods: {
+    drop(e) {
+      e.preventDefault();
+      console.log(e);
+      var text = e.dataTransfer.getData("Text");
+      if (text) {
+        this.content += text;
+      }
+      if (e.dataTransfer.files.length >= 1) {
+        [...e.dataTransfer.files].forEach((file) => {
+          if (file.size < 10485760) {
+            this.attachment.push(file);
+          } else {
+            this.$toast.error(e.target.name + " bigger than 10 mb");
+          }
+        });
+      }
+      this.drag = false;
+    },
     closeUpdate() {
       this.$store.dispatch("changeUpdateMessage", null);
       this.content = "";
@@ -282,5 +311,27 @@ textarea * {
   background-color: white;
   display: none;
   border-radius: 5px;
+}
+.drag {
+  // border: 1px dashed white;
+
+  background-image: linear-gradient(110deg, silver 50%, transparent 50%),
+    linear-gradient(90deg, silver 50%, transparent 50%),
+    linear-gradient(0deg, silver 50%, transparent 50%),
+    linear-gradient(0deg, silver 50%, transparent 50%);
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+  background-size: 15px 2px, 15px 2px, 2px 15px, 2px 15px;
+  background-position: left top, right bottom, left bottom, right top;
+  animation: border-dance 0.5s infinite linear;
+  // border-radius: 10%;
+}
+@keyframes border-dance {
+  0% {
+    background-position: left top, right bottom, left bottom, right top;
+  }
+  100% {
+    background-position: left 15px top, right 15px bottom, left bottom 15px,
+      right top 15px;
+  }
 }
 </style>

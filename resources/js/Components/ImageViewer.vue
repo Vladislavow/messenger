@@ -6,7 +6,7 @@
     <img @click.stop class="image" :src="image.path" />
     <img />
     <div class="btns">
-      <v-btn :loading="loading" small plain @click.stop="downloadImg" fab
+      <v-btn v-if="image.id" :loading="loading" small plain @click.stop="downloadImg" fab
         ><v-icon color="green">mdi-download</v-icon></v-btn
       >
       <v-btn v-if="false" small plain @click.stop="deleteImg" fab
