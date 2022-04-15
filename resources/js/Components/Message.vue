@@ -23,7 +23,6 @@
             :src="file.path"
             max-width="300"
             lazy-src="storage/placeholder.png"
-            @load="scrollDown"
           >
             <template>
               <v-icon
@@ -80,7 +79,7 @@
         </span>
       </div>
     </div>
-    <v-menu dark v-model="showMenu" :position-x="x" :position-y="y" offset-y>
+    <v-menu v-if="message.created_at && message.created_at !='sending'" dark v-model="showMenu" :position-x="x" :position-y="y" offset-y>
       <v-list>
         <div @mouseleave="hide">
           <v-list-item @click="updateMessage"

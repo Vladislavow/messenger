@@ -26,7 +26,7 @@
     },
     "dependencies": {
         "@kevinfaguiar/vue-twemoji-picker": "^5.7.4",
-        "laravel-echo": "^1.11.4",
+        "laravel-echo": "^1.11.5",
         "moment-timezone": "^0.5.34",
         "pusher-js": "^7.0.6",
         "vue-infinite-loading": "^2.4.5",

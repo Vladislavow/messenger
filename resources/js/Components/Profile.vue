@@ -57,7 +57,8 @@
         <v-icon dark>mdi-at</v-icon>{{ " " + chat.nickname }}
       </div>
       <div class="canCopy" @click="copyToClipbioard(chat.email)">
-        <v-icon dark>mdi-email-outline</v-icon>{{ " " + chat.email }}
+        <v-icon dark>mdi-email-outline</v-icon
+        ><a :href="`mailto:`+chat.email">{{ " " + chat.email }} </a>
       </div>
       <div class="canCopy" @click="copyToClipbioard(chat.phone)">
         <v-icon dark>mdi-phone-outline</v-icon>{{ " " + chat.phone }}
@@ -369,4 +370,9 @@ export default {
 .canCopy {
   cursor: pointer;
 }
+a{
+text-decoration: none;
+color: white !important;
+}
+
 </style>

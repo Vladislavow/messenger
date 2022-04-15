@@ -70,7 +70,7 @@
             Close
           </v-btn>
 
-          <v-btn color="green darken-1" text @click="deleteMessage">
+          <v-btn color="red darken-1" text @click="deleteMessage">
             Delete
           </v-btn>
         </v-card-actions>
@@ -297,7 +297,6 @@ export default {
       return result;
     },
     send(text, attachment) {
-      // this.loading = true;
       var tempId = this.makeTempId(5);
       let message = {
         content: text,
@@ -320,11 +319,10 @@ export default {
       axios
         .post("/api/chats/messages", formData, config)
         .then((resp) => {
-          this.messages[
-            this.messages.indexOf(
-              this.messages.find((tempMessage) => tempMessage.tempId == tempId)
-            )
-          ] = resp.data;
+          let index = this.messages.indexOf(
+            this.messages.find((tempMessage) => tempMessage.tempId == tempId)
+          );
+          this.messages.splice(index, 1, resp.data);
           this.$refs.messageList.scrollDown();
           this.$store.dispatch("setLastMessage", {
             sender: resp.data.recipient,

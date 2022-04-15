@@ -5,15 +5,14 @@
     ref="container"
     id="mes"
   >
-    <!-- <infinite-loading  //to do:inifinite loading
-            v-if="messages.length > 0 && page < totalPages + 1"
-            @infinite="getMessages"
-            direction="top"
-            spinner="spiral"
-            ref="infin"
-            force-use-infinite-wrapper="true"
-        /> -->
-    <v-btn
+    <infinite-loading
+      v-if="loading ==false && (messages.length > 0 && page < totalPages + 1)"
+      @infinite="getMessages"
+      direction="top"
+      spinner="spiral"
+      ref="infinite"
+    />
+    <!-- <v-btn
       class="loadMore"
       v-if="messages.length > 0 && page < totalPages + 1"
       @click="getMessages"
@@ -21,7 +20,7 @@
       rounded
     >
       Load more
-    </v-btn>
+    </v-btn> -->
     <template class="messages" v-for="(message, index) in this.messages">
       <div
         :id="'date' + index"
@@ -62,6 +61,14 @@ export default {
     chat: function (value) {
       this.dates = new Map();
     },
+    loading: function (value) {
+      if (value == true) {
+        console.log('so');
+        console.log(this.$refs.infinite)
+        this.$refs.infinite.$data.status = 0
+        // this.$refs.infinite.$state.loaded()
+      }
+    },
   },
   methods: {
     scrollToBefore(index) {
@@ -98,12 +105,15 @@ export default {
     deleteMessage(message) {
       this.$emit("deleteMessage", message);
     },
-    getMessages() {
+    getMessages($state) {
+      console.log("ty");
       this.scrollLock = true;
       this.$emit("getMessages");
+      console.log();
+     $state.loaded()
     },
     checkDate(date, index) {
-      if(date == 'sending'){
+      if (date == "sending") {
         return false;
       }
       let current = new Date(date.replace(" ", "T")).toDateString();
@@ -179,6 +189,7 @@ export default {
   max-width: 20%;
   box-shadow: none;
   align-self: center;
+  min-width: 120px !important;
 }
 .messages::-webkit-scrollbar {
   width: 5px;

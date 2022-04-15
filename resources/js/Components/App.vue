@@ -16,7 +16,8 @@ import ImageViewer from './ImageViewer.vue';
 export default {
     components: { MessageBoard, ChatList, Navbar, ImageViewer },
     data: () => {
-        return {};
+        return {
+        };
     },
     methods: {},
     mounted() {
