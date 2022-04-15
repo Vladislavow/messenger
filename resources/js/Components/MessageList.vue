@@ -66,6 +66,8 @@ export default {
         console.log('so');
         console.log(this.$refs.infinite)
         this.$refs.infinite.$data.status = 0
+        var container = document.getElementById("mes");
+          container.scrollTop = 300;
         // this.$refs.infinite.$state.loaded()
       }
     },
