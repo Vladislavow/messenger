@@ -32,11 +32,14 @@
         {{ dates.get(index) }}
       </div>
       <message
+        :id="'mes' + index"
         @deleteMessage="deleteMessage"
         :message="message"
         :userId="userId"
         :key="index"
         @down="scrollDown"
+        :imgExtensions="imgExtensions"
+        :audioExtensions="audioExtensions"
       />
     </template>
   </div>
@@ -50,7 +53,9 @@ export default {
       scrollLock: false,
       dates: new Map(),
       scroll_timer: null,
-      lst_message:null,
+      lst_message: null,
+       imgExtensions: ["jpeg", "jpg", "gif", "png", "apng", "svg", "bmp"],
+        audioExtensions: ["mp3"],
     };
   },
   components: { Message },
@@ -67,6 +72,10 @@ export default {
         this.$refs.infinite.$data.status = 0;
         var container = document.getElementById("mes");
         container.scrollTop = 500;
+        var last_mess = document.getElementById("mes" + 20);
+        if (last_mess) {
+          last_mess.scrollIntoView();
+        }
       }
     },
   },
@@ -103,6 +112,7 @@ export default {
       }, 700);
     },
     deleteMessage(message) {
+      this.scrollLock = true;
       this.$emit("deleteMessage", message);
     },
     getMessages($state) {
@@ -162,7 +172,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.mes{
+.mes {
   display: flex;
   align-items: flex-end;
 }
@@ -177,6 +187,7 @@ export default {
   flex-direction: column;
   top: 58px;
   bottom: 108px;
+  transition: 0.5s;
   @media (min-height: 900px) {
     height: 82%;
   }

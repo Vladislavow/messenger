@@ -28,7 +28,7 @@ const router = new VueRouter(routes);
 router.beforeEach((to, from, next) => {
     if (
         store.getters.isLoggedIn &&
-        (to.name == "login" || to.name == "register")
+        (to.name == "login" || to.name == "register" || to.name == "reset-password" || to.name == "forgot-password")
     ) {
         next("/");
     }
@@ -70,7 +70,7 @@ Axios.interceptors.response.use(
         } else if (error.response.status == 422) {
             Vue.$toast.error("Unprocessible content");
         } else {
-            Vue.$toast.error(error.response.data.message);
+            Vue.$toast.error(error.response.data);
         }
         return Promise.reject(error);
     }

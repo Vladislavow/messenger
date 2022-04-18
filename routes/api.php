@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', ['as' => 'login', LoginController::class, 'login'])->name('login');
+Route::post('/forgot-password', [UserController::class, 'forgotPassword'])->name('password.forgot');
+Route::post('/reset-password', [UserController::class, 'resetPassword'])->name('password.forgot');
+
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/logout', [LoginController::class, 'logout']);
     Route::get('/user', function () {

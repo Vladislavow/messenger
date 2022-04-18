@@ -27,9 +27,13 @@
         @keypress.enter="login"
         ref="password"
       />
+
       <v-btn dark @click.prevent="login" :loading="loading"> Enter</v-btn>
       <router-link to="/register">
         <v-btn> Sign up</v-btn>
+      </router-link>
+      <router-link class="forgot" to="/forgot-password">
+        <v-btn plain color="red"> Forgot password?</v-btn>
       </router-link>
     </div>
   </div>
@@ -51,9 +55,10 @@ export default {
   methods: {
     login() {
       this.errors = {};
-      this.loading = true;      
-      this.user.browser = this.getBrowserName()
-       this.$store.dispatch("login", this.user)
+      this.loading = true;
+      this.user.browser = this.getBrowserName();
+      this.$store
+        .dispatch("login", this.user)
         .then(() => {
           this.$router.push("/");
         })
@@ -102,12 +107,15 @@ export default {
   min-width: 300px;
   min-height: 200px;
   max-height: 200px;
-  background: rgba(255, 255, 255, 0.24);
+  background: rgba(240, 240, 240, 0.14);
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(6.1px);
   -webkit-backdrop-filter: blur(6.1px);
   border: 1px solid rgba(255, 255, 255, 0.41);
+  @media (max-width:1500px) {
+    max-height: 230px;
+  }
 }
 .back {
   background-image: url("https://blog.1a23.com/wp-content/uploads/sites/2/2020/02/Desktop.png");
@@ -120,5 +128,13 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.forgot {
+  position: absolute;
+  text-align: right;
+  right: 0px;
+  @media (max-width: 1500px) {
+    position: initial;
+  }
 }
 </style>

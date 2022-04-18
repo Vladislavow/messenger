@@ -167,15 +167,27 @@ export default {
     send() {
       if (true) {
         if (this.updateMessage) {
-          this.$emit("updateMessage", this.content, this.attachment);
-          this.content = "";
-          this.attachment = [];
-          this.updatingAttachment = [];
+          if (
+            this.content ||
+            this.attachment.length > 0 ||
+            this.updatingAttachment.length > 0
+          ) {
+            this.$emit("updateMessage", this.content, this.attachment);
+            this.content = "";
+            this.attachment = [];
+            this.updatingAttachment = [];
+          } else {
+            this.$toast.error("Message empty");
+          }
         } else {
-          this.$emit("send", this.content, this.attachment);
-          this.attachment = [];
-          this.content = "";
-          this.$emit("changeWithFiles", false);
+          if (this.content || this.attachment.length > 0) {
+            this.$emit("send", this.content, this.attachment);
+            this.attachment = [];
+            this.content = "";
+            this.$emit("changeWithFiles", false);
+          } else {
+            this.$toast.error("Message empty");
+          }
         }
       }
     },
@@ -253,6 +265,7 @@ export default {
   display: inline;
   background: rgba(33, 33, 33, 0);
   padding: 10px;
+  transition: 0.5s;
   @media (min-height: 900px) {
     height: 12% !important;
   }
@@ -264,6 +277,7 @@ export default {
 }
 .content {
   display: flex;
+  align-items: center;
 }
 .files {
   display: flex;

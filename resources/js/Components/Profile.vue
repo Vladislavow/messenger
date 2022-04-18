@@ -305,6 +305,7 @@ export default {
   border-left: 1px solid black;
   overflow: scroll;
   overflow-x: hidden;
+  transition: 0.5s;
   @media (max-width: 424px) {
     width: 100%;
     right: 0px;

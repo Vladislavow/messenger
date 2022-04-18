@@ -6,7 +6,13 @@
     <img @click.stop class="image" :src="image.path" />
     <img />
     <div class="btns">
-      <v-btn v-if="image.id" :loading="loading" small plain @click.stop="downloadImg" fab
+      <v-btn
+        v-if="image.id"
+        :loading="loading"
+        small
+        plain
+        @click.stop="downloadImg"
+        fab
         ><v-icon color="green">mdi-download</v-icon></v-btn
       >
       <v-btn v-if="false" small plain @click.stop="deleteImg" fab
@@ -83,10 +89,18 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
 }
 .image {
   max-height: 97%;
   max-width: 97%;
+   user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
 }
 .btns {
   position: absolute;
@@ -100,7 +114,8 @@ export default {
   position: absolute;
   top: 15px;
   left: 15px;
-  height:40px;
+  height: 40px;
   padding-top: 5px;
+  max-width: 70%;
 }
 </style>
