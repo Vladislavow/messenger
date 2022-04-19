@@ -12,6 +12,7 @@ use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
 use App\Models\Attachment;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class MessageController extends Controller
 {
@@ -100,6 +101,19 @@ class MessageController extends Controller
         $message->delete();
         broadcast(new MessageDeleted($message));
         return response()->json('deleted', 200);
+    }
+
+    public function getAttachment(Attachment $attachment)
+    {
+        $message = $attachment->message;
+        /** @var User $user */
+        $user = auth()->user();
+        if ($user->id == $message->sender || $user->id == $message->recepient) {
+            $response = new BinaryFileResponse($attachment->path);
+            BinaryFileResponse::trustXSendfileTypeHeader();
+            return $response;
+        }
+        return response()->json('Forbidden', 403);
     }
 
     public function downloadAttachment(Attachment $attachment)

@@ -127,7 +127,7 @@ export default {
           .listen("MessageUpdated", (e) => {
             this.handleUpdated(e.message);
           });
-        window.Echo.join(`chat.1`)
+        let channel = window.Echo.join(`chat.1`)
           .here((users) => {})
           .joining((user) => {
             this.$store.dispatch("changeOnlineStatus", {
@@ -141,6 +141,14 @@ export default {
               id: user.id,
             });
           });
+        setTimeout(() => {
+          window.Echo.connector.channels["presence-chat.1"].listenForWhisper(
+            "typing",
+            (e) => {
+              this.handleTypingStatus(e);
+            }
+          );
+        }, 0);
       })
       .catch((err) => {});
   },
@@ -153,6 +161,20 @@ export default {
     },
   },
   methods: {
+    handleTypingStatus(e) {
+      let sender = e.id;
+      if (e.recipient == this.userId)
+        this.$store.dispatch("changeTypingStatus", {
+          id: sender,
+          status: true,
+        });
+      setTimeout(() => {
+        this.$store.dispatch("changeTypingStatus", {
+          id: sender,
+          status: null,
+        });
+      }, 3000);
+    },
     closeBoard(event) {
       this.$store.dispatch("selectChat", this.chat.id);
     },

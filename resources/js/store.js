@@ -33,7 +33,6 @@ export default new Vuex.Store({
         logout(state) {
             state.status = "";
             state.token = "";
-            state.is_anouncer = false;
         },
         set_user(state, value) {
             state.user = value;
@@ -145,6 +144,11 @@ export default new Vuex.Store({
         set_theme(state, theme) {
             localStorage.setItem('theme', theme)
             state.selectedTheme = theme
+        },
+        set_typing_status(state, data) {
+            state.chats[state.chats.indexOf(
+                state.chats.find((user) => user.id == data.id)
+            )].typing = data.status;
         }
     },
     actions: {
@@ -199,9 +203,15 @@ export default new Vuex.Store({
             return new Promise((resolve, reject) => {
                 axios({ url: "/api/logout", method: "POST" });
                 commit("logout");
-                localStorage.removeItem("userid");
-                localStorage.removeItem("token");
-                delete axios.defaults.headers.common["Authorization"];
+                axios
+                    .post("/api/user/online", { status: false })
+                    .then((resp) => {
+                        localStorage.removeItem("userid");
+                        localStorage.removeItem("token");
+                        delete axios.defaults.headers.common["Authorization"];
+                    }).finally(() => {
+
+                    });
                 resolve();
             });
         },
@@ -275,6 +285,9 @@ export default new Vuex.Store({
         changeSelectedTheme({ commit }, theme) {
             commit('set_theme', theme);
         },
+        changeTypingStatus({ commit }, data) {
+            commit('set_typing_status', data);
+        },
     },
     getters: {
         isLoggedIn: (state) => !!state.token,
@@ -295,5 +308,14 @@ export default new Vuex.Store({
         selectedAudio: (state) => state.selectedAudio,
         selectedImage: (state) => state.selectedImage,
         selectedTheme: (state) => state.selectedTheme,
+        typingStatus: (state) => 
+            // if (state.selectedChat) {
+                state.chats[
+                    state.chats.indexOf(
+                        state.chats.find((chat) => chat.id == state.selectedChat)
+                    )
+                ].typing
+            // }
+        ,
     },
 });

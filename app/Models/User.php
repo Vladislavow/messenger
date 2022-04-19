@@ -47,7 +47,8 @@ class User extends Authenticatable
 
     public $appends = [
         'last_message',
-        'unread'
+        'unread',
+        'typing'
     ];
     /**
      * The attributes that should be cast.
@@ -60,6 +61,11 @@ class User extends Authenticatable
         'last_seen' => 'datetime:Y-m-d h:i:s',
         'online' => 'boolean'
     ];
+
+    public function getTypingAttribute()
+    {
+        return false;
+    }
 
     public function getLastSeentAttribute($value)
     {

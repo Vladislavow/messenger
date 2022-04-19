@@ -17,16 +17,16 @@
           <v-btn :loading="loading" @click.prevent="sendResetMail"
             >Send mail</v-btn
           >
-          <router-link  to="/login">
-            <v-btn >Log in</v-btn>
+          <router-link to="/login">
+            <v-btn>Log in</v-btn>
           </router-link>
         </div>
       </div>
       <div v-if="sent" class="sent">
         <div>We have emailed your password reset link!</div>
-        <router-link  to="/login">
-            <v-btn >Log in</v-btn>
-          </router-link>
+        <router-link to="/login">
+          <v-btn>Log in</v-btn>
+        </router-link>
       </div>
     </div>
   </div>
@@ -55,8 +55,6 @@ export default {
           if (err.response.status == 422) {
             this.errors = err.response.data.errors;
           } else {
-            console.log(err.response.data);
-            //   this.$toast.error(err.response.data);
           }
         })
         .finally(() => {
@@ -71,12 +69,11 @@ export default {
 .forgot {
   height: 100%;
   width: 100%;
-  background: rgb(104, 103, 103);
+  background: rgb(58, 56, 83);
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: url("https://blog.1a23.com/wp-content/uploads/sites/2/2020/02/pattern-20.svg");
-  background-size: cover;
+  background-image: url("https://blog.1a23.com/wp-content/uploads/sites/2/2020/02/pattern-7.svg");
 }
 
 .form {

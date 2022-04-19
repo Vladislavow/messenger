@@ -27,8 +27,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         return auth()->user()->currentAccessToken()->id;
     });
     Route::delete('/session/{id}', function ($id) {
-         auth()->user()->tokens()->where('id', $id)->first()->delete();
-         return response()->json('Session closed');
+        auth()->user()->tokens()->where('id', $id)->first()->delete();
+        return response()->json('Session closed');
     });
     Route::put('/user', [UserController::class, 'updateUser']);
     Route::post('/user/avatar', [UserController::class, 'updateAvatar']);
@@ -43,9 +43,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/download/{attachment}', [MessageController::class, 'downloadAttachment']);
     Route::post('/message/{message}', [MessageController::class, 'update']);
     Route::delete('/attachment/{attachment}', [MessageController::class, 'deleteAttachment']);
-    Route::get('/song/{attachment}', function (Attachment $attachment) {
-        $response = new BinaryFileResponse($attachment->path);
-        BinaryFileResponse::trustXSendfileTypeHeader();
-        return $response;
-    });
+    Route::get('/attachment/{attachment}', [MessageController::class, 'getAttachment']);
 });

@@ -52,6 +52,7 @@
         @dragleave="drag = false"
         @keypress.enter="keysHandling"
         hide-details
+        @input="sendTypingStatus"
       >
         <template v-if="updateMessage != null" v-slot:prepend>
           <v-icon @click="closeUpdate"> mdi-pencil-remove </v-icon>
@@ -130,6 +131,7 @@ export default {
         index: null,
       },
       drag: false,
+      typing: false,
     };
   },
   watch: {
@@ -142,9 +144,21 @@ export default {
     },
   },
   methods: {
+    sendTypingStatus() {
+      if (this.typing == false) {
+        window.Echo.connector.channels["presence-chat.1"].whisper("typing", {
+          recipient: this.chat,
+          id: this.userId,
+          typing: true,
+        });
+        this.typing = true;
+        setTimeout(() => {
+          this.typing = false;
+        }, 3000);
+      }
+    },
     drop(e) {
       e.preventDefault();
-      console.log(e);
       var text = e.dataTransfer.getData("Text");
       if (text) {
         this.content += text;
@@ -251,6 +265,12 @@ export default {
     },
     updateMessage: function () {
       return this.$store.getters.updateMessage;
+    },
+    chat: function () {
+      return this.$store.getters.selectedChat;
+    },
+    userId: function () {
+      return parseInt(localStorage.getItem("userid"));
     },
   },
 };

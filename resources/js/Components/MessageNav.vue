@@ -24,14 +24,17 @@
       <div v-if="chat" class="title">
         {{ chat.firstname + " " + chat.lastname }}
       </div>
-      <div class="online">
-        {{
-          chat.online
-            ? "Online"
-            : chat.last_seen
-            ? "Last seen: " + c_last_seen
-            : "Offline"
-        }}
+      <div class="statuses">
+        <div v-if="!chat.typing" class="online">
+          {{
+            chat.online
+              ? "Online"
+              : chat.last_seen
+              ? "Last seen: " + c_last_seen
+              : "Offline"
+          }}
+        </div>
+        <div v-if="chat.typing" class="typing"></div>
       </div>
     </div>
   </div>
@@ -180,14 +183,42 @@ export default {
   color: white;
   flex-direction: column;
 }
-.online {
-  font-size: 14px;
+
+.statuses {
+  display: flex;
+  font-size: 12px;
+  margin-bottom: 3px;
 }
 .close-btn {
   align-self: center;
   display: none;
   @media (max-width: 424px) {
     display: initial;
+  }
+}
+.typing {
+  content: "";
+  position: relative;
+}
+.typing::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  animation: typing 0.7s infinite;
+}
+@keyframes typing {
+  0% {
+    content: "Typing";
+  }
+  25% {
+    content: "Typing.";
+  }
+  50% {
+    content: "Typing..";
+  }
+  100% {
+    content: "Typing...";
   }
 }
 </style>

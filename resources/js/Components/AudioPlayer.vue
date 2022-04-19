@@ -151,7 +151,7 @@ export default {
     },
     getFile(value) {
       axios
-        .get("/api/song/" + value, { responseType: "blob" })
+        .get("/api/attachment/" + value, { responseType: "blob" })
         .then((response) => {
           let url = URL.createObjectURL(response.data);
           this.player.src = url;

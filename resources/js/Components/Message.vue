@@ -16,6 +16,7 @@
             <div class="audio_title">{{ file.original_name }}</div>
           </div>
           <v-img
+            :id="'attachment.' + file.id"
             @click="selectImage(file)"
             class="img-file"
             v-if="imgExtensions.includes(file.extension)"
@@ -128,11 +129,12 @@ export default {
     };
   },
   props: ["message", "userId", "imgExtensions", "audioExtensions"],
-  mounted() {},
+  mounted() {
+  },
   methods: {
     hasLink() {
       var expression =
-        /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~@:%]*)*(#[\w\-]*)?(\?[^\s]*)?/gi;
+        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
       var regex = new RegExp(expression);
       if (this.message.content) {
         return this.message.content.match(expression) != null;
@@ -236,6 +238,19 @@ export default {
           this.loading = false;
         });
     },
+    // getFile(file) { //to do: customize image src
+    //   axios
+    //     .get("/api/attachment/" + file, { responseType: "blob" })
+    //     .then((response) => {
+    //       let url = URL.createObjectURL(response.data);
+    //       let fileContainer = document.getElementById("attachment." + file);
+    //       console.log(url);
+    //       console.log(fileContainer);
+    //       // fileContainer.setAttribute("src", url);
+    //       console.log(fileContainer);
+    //       return url;
+    //     });
+    // },
   },
   computed: {
     contentArr: function () {
