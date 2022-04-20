@@ -89,6 +89,8 @@ export default {
                         this.$store.dispatch("setSearch", true);
                         this.$store.dispatch("setSearchedChats", response.data);
                         this.loading = false;
+                    }).catch(error=>{
+                        
                     });
             } else {
                 this.stopSearch();

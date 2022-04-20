@@ -24,6 +24,7 @@
         :src="this.chat.avatar"
         max-height="40%"
         max-width="40%"
+        aspect-ratio="1"
         @click="showImage"
       >
         <template>
@@ -329,6 +330,7 @@ export default {
   margin-left: 30%;
   margin-bottom: 10px;
   min-height: 50px;
+  
 }
 .name {
   color: white;

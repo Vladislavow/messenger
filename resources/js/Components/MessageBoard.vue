@@ -81,7 +81,6 @@
 
 <script>
 import MessageNav from "./MessageNav.vue";
-import Echo from "laravel-echo";
 import MessageCreator from "./MessageCreator.vue";
 import MessageList from "./MessageList.vue";
 import Profile from "./Profile.vue";
@@ -101,6 +100,7 @@ export default {
       online: [],
       dialog: false,
       deleteableMessage: null,
+      typingTimeOut: null,
     };
   },
   destroyed() {
@@ -108,49 +108,7 @@ export default {
     window.localStorage.setItem("titleName", "awd");
   },
   mounted() {
-    this.$store
-      .dispatch("getUser")
-      .then((response) => {
-        window.Echo.private(`messages.${response.data.id}`)
-          .listen("NewMessage", (e) => {
-            this.handleIncoming(e.message);
-          })
-          .listen("HasRead", (e) => {
-            this.marAsRead(e.chat);
-          })
-          .listen("ChatUpdated", (e) => {
-            this.$store.dispatch("updateChat", e.chat);
-          })
-          .listen("MessageDeleted", (e) => {
-            this.handleDeleted(e.message);
-          })
-          .listen("MessageUpdated", (e) => {
-            this.handleUpdated(e.message);
-          });
-        let channel = window.Echo.join(`chat.1`)
-          .here((users) => {})
-          .joining((user) => {
-            this.$store.dispatch("changeOnlineStatus", {
-              status: true,
-              id: user.id,
-            });
-          })
-          .leaving((user) => {
-            this.$store.dispatch("changeOnlineStatus", {
-              status: false,
-              id: user.id,
-            });
-          });
-        setTimeout(() => {
-          window.Echo.connector.channels["presence-chat.1"].listenForWhisper(
-            "typing",
-            (e) => {
-              this.handleTypingStatus(e);
-            }
-          );
-        }, 0);
-      })
-      .catch((err) => {});
+    this.connectToPusher();
   },
   watch: {
     chat: function (val) {
@@ -161,6 +119,51 @@ export default {
     },
   },
   methods: {
+    connectToPusher() {
+      this.$store
+        .dispatch("getUser")
+        .then((response) => {
+          window.Echo.private(`messages.${response.data.id}`)
+            .listen("NewMessage", (e) => {
+              this.handleIncoming(e.message);
+            })
+            .listen("HasRead", (e) => {
+              this.marAsRead(e.chat);
+            })
+            .listen("ChatUpdated", (e) => {
+              this.$store.dispatch("updateChat", e.chat);
+            })
+            .listen("MessageDeleted", (e) => {
+              this.handleDeleted(e.message);
+            })
+            .listen("MessageUpdated", (e) => {
+              this.handleUpdated(e.message);
+            });
+          let channel = window.Echo.join(`chat.1`)
+            .here((users) => {})
+            .joining((user) => {
+              this.$store.dispatch("changeOnlineStatus", {
+                status: true,
+                id: user.id,
+              });
+            })
+            .leaving((user) => {
+              this.$store.dispatch("changeOnlineStatus", {
+                status: false,
+                id: user.id,
+              });
+            });
+          setTimeout(() => {
+            window.Echo.connector.channels["presence-chat.1"].listenForWhisper(
+              "typing",
+              (e) => {
+                this.handleTypingStatus(e);
+              }
+            );
+          }, 0);
+        })
+        .catch((err) => {});
+    },
     handleTypingStatus(e) {
       let sender = e.id;
       if (e.recipient == this.userId)
@@ -168,12 +171,13 @@ export default {
           id: sender,
           status: true,
         });
-      setTimeout(() => {
+      clearTimeout(this.typingTimeOut);
+      this.typingTimeOut = setTimeout(() => {
         this.$store.dispatch("changeTypingStatus", {
           id: sender,
           status: null,
         });
-      }, 3000);
+      }, 3100);
     },
     closeBoard(event) {
       this.$store.dispatch("selectChat", this.chat.id);

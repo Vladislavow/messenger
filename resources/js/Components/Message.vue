@@ -67,21 +67,21 @@
       </div>
       <span class="text" v-if="hasLink()">
         <span v-for="(item, index) in contentArr" :key="index">
-          {{ !item.is_link ? item.content : "" }}
+          <span class="text-wl">{{ !item.is_link ? item.content : "" }}</span>
           <a v-if="item.is_link" target="_blank" :href="item.content">{{
             item.content
           }}</a>
         </span>
       </span>
       <span v-if="!hasLink()" class="text">
-        {{ message.content }}
+        <span class="text-wl">{{ message.content }}</span>
       </span>
       <div class="statuses">
         <span
           v-if="message.created_at && message.created_at == 'sending'"
           class="time"
         >
-          <v-icon small>mdi-clock-outline</v-icon>
+          <v-icon small class="clock">mdi-clock-outline</v-icon>
         </span>
         <span
           v-if="message.created_at && message.created_at != 'sending'"
@@ -129,12 +129,49 @@ export default {
     };
   },
   props: ["message", "userId", "imgExtensions", "audioExtensions"],
-  mounted() {
-  },
+  mounted() {},
   methods: {
     hasLink() {
       var expression =
-        /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
+        "((?:(http|https|Http|Https|rtsp|Rtsp|ftp):\\/\\/(?:(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)" +
+        "\\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,64}(?:\\:(?:[a-zA-Z0-9\\$\\-\\_" +
+        "\\.\\+\\!\\*\\'\\(\\)\\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,25})?\\@)?)?" +
+        "((?:(?:[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}\\.)+" +
+        "(?:" +
+        "(?:aero|arpa|asia|a[cdefgilmnoqrstuwxz])" +
+        "|(?:biz|b[abdefghijmnorstvwyz])" +
+        "|(?:cat|com|coop|c[acdfghiklmnoruvxyz])" +
+        "|d[ejkmoz]" +
+        "|(?:edu|e[cegrstu])" +
+        "|f[ijkmor]" +
+        "|(?:gov|g[abdefghilmnpqrstuwy])" +
+        "|h[kmnrtu]" +
+        "|(?:info|int|i[delmnoqrst])" +
+        "|(?:jobs|j[emop])" +
+        "|k[eghimnrwyz]" +
+        "|l[abcikrstuvy]" +
+        "|(?:mil|mobi|museum|m[acdghklmnopqrstuvwxyz])" +
+        "|(?:name|net|n[acefgilopruz])" +
+        "|(?:org|om)" +
+        "|(?:pro|p[aefghklmnrstwy])" +
+        "|qa" +
+        "|r[eouw]" +
+        "|s[abcdeghijklmnortuvyz]" +
+        "|(?:tel|travel|t[cdfghjklmnoprtvwz])" +
+        "|u[agkmsyz]" +
+        "|v[aceginu]" +
+        "|w[fs]" +
+        "|y[etu]" +
+        "|z[amw]))" +
+        "|(?:(?:25[0-5]|2[0-4]" +
+        "[0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(?:25[0-5]|2[0-4][0-9]" +
+        "|[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(?:25[0-5]|2[0-4][0-9]|[0-1]" +
+        "[0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}" +
+        "|[1-9][0-9]|[0-9])))" +
+        "(?:\\:\\d{1,5})?)" +
+        "(\\/(?:(?:[a-zA-Z0-9\\;\\/\\?\\:\\@\\&\\=\\#\\~" +
+        "\\-\\.\\+\\!\\*\\'\\(\\)\\,\\_])|(?:\\%[a-fA-F0-9]{2}))*)?" +
+        "(?:\\b|$)";
       var regex = new RegExp(expression);
       if (this.message.content) {
         return this.message.content.match(expression) != null;
@@ -341,7 +378,10 @@ export default {
     }
   }
 }
-
+.text-wl {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
 .file {
   color: black;
   padding: 5px;
@@ -381,5 +421,18 @@ export default {
 }
 .audio_title {
   margin-left: 10px;
+}
+
+.clock {
+  animation: dial 1s infinite linear;
+}
+
+@keyframes dial {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>

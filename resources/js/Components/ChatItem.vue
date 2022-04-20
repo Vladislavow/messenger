@@ -74,14 +74,13 @@ export default {
 <style scoped>
 .chat {
   min-height: 60px;
-  /* border-radius: 10px; */
   margin: 10px;
   width: 97%;
   background: rgb(33, 33, 33);
   left: 0;
   display: flex;
-  /* border-radius: 3px 24px 24px 24px; */
   border-radius: 24px;
+  transition: transform 1s;
 }
 
 .title {
@@ -122,8 +121,8 @@ export default {
 }
 .chat:hover {
   background: rgb(31, 53, 77);
-  -webkit-box-shadow: 1px 1px 18px -2px rgba(31, 53, 77,0.73); 
-box-shadow: 1px 1px 18px -2px rgba(31, 53, 77,0.73);
+  -webkit-box-shadow: 1px 1px 18px -2px rgba(31, 53, 77, 0.73);
+  box-shadow: 1px 1px 18px -2px rgba(31, 53, 77, 0.73);
 }
 .avatar {
   max-height: 50px;

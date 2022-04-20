@@ -15,10 +15,6 @@ import Toast, { POSITION } from "vue-toastification";
 import "vue-toastification/dist/index.css";
 import VueMoment from "vue-moment";
 import moment from "moment-timezone";
-import linkify from 'vue-linkify'
-import sanitizeHTML from 'sanitize-html';
-Vue.prototype.$sanitize = sanitizeHTML
-Vue.directive('linkified', linkify)
 
 moment.tz.setDefault("Europe/Kiev");
 Vue.use(VueMoment, {
@@ -63,14 +59,20 @@ Axios.interceptors.response.use(
         return response;
     },
     function (error) {
-        if (error.response.status === 401) {
-            localStorage.removeItem("token");
-            localStorage.removeItem("userid");
-            location.reload();
-        } else if (error.response.status == 422) {
-            Vue.$toast.error("Unprocessible content");
-        } else {
-            Vue.$toast.error(error.response.data);
+        // if(error=='Cancel'){
+        //     return;
+        // }
+        if (error.response && error.response.status) {
+            if (error.response.status === 401) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("userid");
+                location.reload();
+            } else if (error.response.status == 422) {
+                Vue.$toast.error("Unprocessible content");
+            } else {
+                Vue.$toast.error(error.response.data);
+            }
+            return Promise.reject(error);
         }
         return Promise.reject(error);
     }

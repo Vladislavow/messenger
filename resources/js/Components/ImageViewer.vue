@@ -3,16 +3,11 @@
     <div class="img-title" v-if="image.original_name">
       {{ image.original_name }}
     </div>
+    <!-- <zoom-on-hover :img-normal="image.path"  :scale="1.5" 
+ ></zoom-on-hover> -->
     <img @click.stop class="image" :src="image.path" />
-    <img />
     <div class="btns">
-      <v-btn
-        v-if="image.id"
-        :loading="loading"
-        small
-        plain
-        @click.stop="downloadImg"
-        fab
+      <v-btn v-if="image.id" :loading="loading" small plain @click.stop="downloadImg" fab
         ><v-icon color="green">mdi-download</v-icon></v-btn
       >
       <v-btn v-if="false" small plain @click.stop="deleteImg" fab
@@ -26,7 +21,12 @@
 </template>
 
 <script>
+import zoomOnHover from '../zoom/zoomOnHover.js'
+import '../zoom/zoomOnHover.css'
 export default {
+  components:{
+    zoomOnHover:zoomOnHover
+  },
   data() {
     return {
       loading: false,
@@ -90,17 +90,13 @@ export default {
   justify-content: center;
   align-items: center;
   user-select: none;
-  -ms-user-select: none;
+   -ms-user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;
 }
 .image {
   max-height: 97%;
   max-width: 97%;
-   user-select: none;
-  -ms-user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
 }
 .btns {
   position: absolute;
@@ -114,7 +110,7 @@ export default {
   position: absolute;
   top: 15px;
   left: 15px;
-  height: 40px;
+  height:40px;
   padding-top: 5px;
   max-width: 70%;
 }
