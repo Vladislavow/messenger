@@ -87,7 +87,7 @@
           v-if="message.created_at && message.created_at != 'sending'"
           class="time"
         >
-          {{ message.created_at | moment("timezone", "Europe/Kiev", "hh:mm") }}
+          {{ message.created_at | moment("timezone", "Europe/Kiev", "HH:mm") }}
         </span>
         <span class="read">
           <v-icon small v-if="userId != message.recipient">{{

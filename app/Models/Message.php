@@ -18,7 +18,7 @@ class Message extends Model
     ];
 
     protected $casts = [
-        'created_at' => 'datetime:Y'
+        'created_at' => 'datetime:Y-m-d'
     ];
 
     public function getCreatedAtAttribute($value)

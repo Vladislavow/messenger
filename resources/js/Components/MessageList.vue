@@ -12,22 +12,14 @@
       spinner="spiral"
       ref="infinite"
     />
-    <!-- <v-btn
-      class="loadMore"
-      v-if="messages.length > 0 && page < totalPages + 1"
-      @click="getMessages"
-      :loading="loading"
-      rounded
-    >
-      Load more
-    </v-btn> -->
-    <template class="messages" v-for="(message, index) in this.messages">
+
+    <template class="messges obs" v-for="(message, index) in this.messages">
       <div
         :id="'date' + index"
         :ref="'date' + index"
         v-if="checkDate(message.created_at, index)"
         @click="scrollToBefore(index)"
-        class="date"
+        :class="{ date: true, sticky: scroll_timer != null }"
       >
         {{ dates.get(index) }}
       </div>
@@ -42,6 +34,7 @@
         :audioExtensions="audioExtensions"
       />
     </template>
+    <div class="empty" v-if="this.messages.length == 0">No messages yet</div>
   </div>
 </template>
 
@@ -54,8 +47,8 @@ export default {
       dates: new Map(),
       scroll_timer: null,
       lst_message: null,
-       imgExtensions: ["jpeg", "jpg", "gif", "png", "apng", "svg", "bmp"],
-        audioExtensions: ["mp3"],
+      imgExtensions: ["jpeg", "jpg", "gif", "png", "apng", "svg", "bmp"],
+      audioExtensions: ["mp3"],
     };
   },
   components: { Message },
@@ -219,6 +212,25 @@ export default {
 .messages::-webkit-scrollbar-thumb:hover {
   display: initial;
 }
+.empty {
+  color: white;
+  text-align: center;
+  border: 1px solid white;
+  border-radius: 10px;
+  width: 150px;
+  align-self: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6.3px);
+  -webkit-backdrop-filter: blur(6.3px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  margin-top: 10px;
+}
 .date {
   align-self: center;
   text-align: center;
@@ -244,5 +256,9 @@ export default {
   .messages {
     width: 61%;
   }
+}
+.sticky {
+  position: sticky;
+  top: 10px;
 }
 </style>

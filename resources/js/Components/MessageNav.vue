@@ -132,7 +132,7 @@ export default {
         let last_seen = new Date(this.chat.last_seen.replace(" ", "T"));
         let diff = now - last_seen;
         if (diff < 60 * 1000) {
-          return "< 1 minute";
+          return "just now";
         } else if (diff < 60 * 60 * 1000) {
           const temp = DateDiff.inMinutes(last_seen, now);
           return `${temp} minute${temp == 1 ? "" : "s"} ago`;

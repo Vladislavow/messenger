@@ -58,7 +58,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'birthdate' => 'date:Y-m-d',
-        'last_seen' => 'datetime:Y-m-d h:i:s',
+        'last_seen' => 'datetime:Y-m-d H:i:s',
         'online' => 'boolean'
     ];
 
