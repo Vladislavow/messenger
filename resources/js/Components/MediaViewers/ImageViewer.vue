@@ -3,8 +3,6 @@
     <div class="img-title" v-if="image.original_name">
       {{ image.original_name }}
     </div>
-    <!-- <zoom-on-hover :img-normal="image.path"  :scale="1.5" 
- ></zoom-on-hover> -->
     <img @click.stop class="image" :src="image.path" />
     <div class="btns">
       <v-btn v-if="image.id" :loading="loading" small plain @click.stop="downloadImg" fab
@@ -21,12 +19,7 @@
 </template>
 
 <script>
-import zoomOnHover from '../zoom/zoomOnHover.js'
-import '../zoom/zoomOnHover.css'
 export default {
-  components:{
-    zoomOnHover:zoomOnHover
-  },
   data() {
     return {
       loading: false,

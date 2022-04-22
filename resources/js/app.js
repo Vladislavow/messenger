@@ -59,9 +59,6 @@ Axios.interceptors.response.use(
         return response;
     },
     function (error) {
-        // if(error=='Cancel'){
-        //     return;
-        // }
         if (error.response && error.response.status) {
             if (error.response.status === 401) {
                 localStorage.removeItem("token");

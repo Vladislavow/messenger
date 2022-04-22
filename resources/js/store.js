@@ -201,18 +201,16 @@ export default new Vuex.Store({
         },
         logout({ commit }) {
             return new Promise((resolve, reject) => {
-                axios({ url: "/api/logout", method: "POST" });
-                commit("logout");
                 axios
                     .post("/api/user/online", { status: false })
                     .then((resp) => {
+                        axios({ url: "/api/logout", method: "POST" });
+                        commit("logout");
                         localStorage.removeItem("userid");
                         localStorage.removeItem("token");
                         delete axios.defaults.headers.common["Authorization"];
-                    }).finally(() => {
-
+                        resolve();
                     });
-                resolve();
             });
         },
         getUser({ commit }) {
@@ -308,14 +306,14 @@ export default new Vuex.Store({
         selectedAudio: (state) => state.selectedAudio,
         selectedImage: (state) => state.selectedImage,
         selectedTheme: (state) => state.selectedTheme,
-        typingStatus: (state) => 
+        typingStatus: (state) =>
             // if (state.selectedChat) {
-                state.chats[
-                    state.chats.indexOf(
-                        state.chats.find((chat) => chat.id == state.selectedChat)
-                    )
-                ].typing
-            // }
+            state.chats[
+                state.chats.indexOf(
+                    state.chats.find((chat) => chat.id == state.selectedChat)
+                )
+            ].typing
+        // }
         ,
     },
 });

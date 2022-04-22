@@ -8,11 +8,11 @@
 </template>
 
 <script>
-import MessageBoard from "./MessageBoard.vue";
-import ChatList from "./ChatList.vue";
+import MessageBoard from "./Messages/MessageBoard.vue";
+import ChatList from "./Chats/ChatList.vue";
 import Navbar from "./Navbar.vue";
 import Echo from "laravel-echo";
-import ImageViewer from "./ImageViewer.vue";
+import ImageViewer from "./MediaViewers/ImageViewer.vue";
 export default {
   components: { MessageBoard, ChatList, Navbar, ImageViewer },
   data: () => {

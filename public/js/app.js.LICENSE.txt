@@ -13,22 +13,8 @@
  */
 
 /*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <http://feross.org>
- * @license  MIT
- */
-
-/*!
  * Vue.js v2.6.14
  * (c) 2014-2021 Evan You
- * Released under the MIT License.
- */
-
-/*!
- * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
- *
- * Copyright (c) 2014-2017, Jon Schlinkert.
  * Released under the MIT License.
  */
 
@@ -1326,8 +1312,6 @@ PERFORMANCE OF THIS SOFTWARE.
 /*! exports provided: stack */
 
 /*! exports provided: weekNumber, isLeapYear */
-
-/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 
 /*! no static exports found */
 

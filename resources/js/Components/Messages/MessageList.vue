@@ -6,13 +6,12 @@
     id="mes"
   >
     <infinite-loading
-      v-if="loading == false && messages.length > 0 && page < totalPages + 1"
+      v-if="canlLoadMore == true && messages.length >= 40 && page < totalPages + 1"
       @infinite="getMessages"
       direction="top"
       spinner="spiral"
       ref="infinite"
     />
-
     <template class="messges obs" v-for="(message, index) in this.messages">
       <div
         :id="'date' + index"
@@ -34,7 +33,9 @@
         :audioExtensions="audioExtensions"
       />
     </template>
-    <div class="empty" v-if="this.messages.length == 0">No messages yet</div>
+    <div class="empty" v-if="this.messages.length == 0 && loading == false">
+      No messages yet
+    </div>
   </div>
 </template>
 
@@ -49,6 +50,7 @@ export default {
       lst_message: null,
       imgExtensions: ["jpeg", "jpg", "gif", "png", "apng", "svg", "bmp"],
       audioExtensions: ["mp3"],
+      canlLoadMore: false,
     };
   },
   components: { Message },
@@ -61,7 +63,12 @@ export default {
       this.dates = new Map();
     },
     loading: function (value) {
-      if (value == true && this.messages.length > 20) {
+      if (value == false) {
+        setTimeout(() => {
+          this.canlLoadMore = true;
+        }, 1000);
+      }
+      if (value == true && this.messages.page > 40) {
         this.$refs.infinite.$data.status = 0;
         var container = document.getElementById("mes");
         container.scrollTop = 500;
@@ -102,13 +109,14 @@ export default {
       this.scroll_timer = null;
       this.scroll_timer = setTimeout(() => {
         this.scroll_timer = null;
-      }, 700);
+      }, 1000);
     },
     deleteMessage(message) {
       this.scrollLock = true;
       this.$emit("deleteMessage", message);
     },
     getMessages($state) {
+      this.canlLoadMore = false;
       this.scrollLock = true;
       this.$emit("getMessages");
       $state.loaded();
@@ -167,7 +175,6 @@ export default {
 <style lang="scss" scoped>
 .mes {
   display: flex;
-  align-items: flex-end;
 }
 .messages {
   position: fixed;
@@ -181,6 +188,7 @@ export default {
   top: 58px;
   bottom: 108px;
   transition: 0.5s;
+
   @media (min-height: 900px) {
     height: 82%;
   }
@@ -251,6 +259,7 @@ export default {
   -moz-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+  transition: 0.5s;
 }
 @media (max-width: 700px) {
   .messages {
@@ -258,7 +267,12 @@ export default {
   }
 }
 .sticky {
+  background: rgb(33, 33, 33);
+  box-shadow: none;
   position: sticky;
-  top: 10px;
+  top: 5px;
+}
+.obs {
+  align-items: flex-end;
 }
 </style>

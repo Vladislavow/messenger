@@ -106,11 +106,14 @@
     >
       <v-list>
         <div @mouseleave="hide">
-          <v-list-item @click="updateMessage"
-            ><v-icon>mdi-pencil</v-icon> Update
+          <v-list-item v-if="message.sender==userId" @click="updateMessage"
+            ><v-icon>mdi-pencil-outline</v-icon> Update
           </v-list-item>
-          <v-list-item color="purple" class="delete" @click="deleteMessage"
-            ><v-icon color="red">mdi-delete</v-icon> Delete
+          <v-list-item color="purple" class="copy" @click="copyMessage"
+            ><v-icon color="white">mdi-clipboard-outline</v-icon> Copy
+          </v-list-item>
+          <v-list-item v-if="message.sender==userId" color="purple" class="delete" @click="deleteMessage"
+            ><v-icon color="red">mdi-delete-outline</v-icon> Delete
           </v-list-item>
         </div>
       </v-list>
@@ -225,19 +228,20 @@ export default {
       }
       return this.message.content;
     },
+    copyMessage() {
+      window.navigator.clipboard.writeText(this.message.content);
+    },
     scrollDown(e) {
       this.$emit("down");
     },
     show(e) {
       e.preventDefault();
-      if (this.message.sender == localStorage.getItem("userid")) {
-        this.showMenu = false;
-        this.x = e.clientX;
-        this.y = e.clientY;
-        this.$nextTick(() => {
-          this.showMenu = true;
-        });
-      }
+      this.showMenu = false;
+      this.x = e.clientX;
+      this.y = e.clientY;
+      this.$nextTick(() => {
+        this.showMenu = true;
+      });
     },
     hide() {
       this.showMenu = false;
@@ -424,10 +428,10 @@ export default {
 }
 
 .clock {
-  animation: dial 1s infinite linear;
+  animation: time 1s infinite linear;
 }
 
-@keyframes dial {
+@keyframes time {
   0% {
     transform: rotate(0deg);
   }

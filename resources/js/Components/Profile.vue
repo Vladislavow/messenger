@@ -177,10 +177,10 @@
       >
       </v-textarea>
       <div class="buttons">
-        <v-btn plain color="green" dark class="save" @click.prevent="updateUser"
+        <v-btn :loading="loading" plain color="green" dark class="save" @click.prevent="updateUser"
           >Save<v-icon color="green">mdi-content-save</v-icon>
         </v-btn>
-        <v-btn plain color="red" @click.prevent="closeUpdate"
+        <v-btn :disabled="loading" plain color="red" @click.prevent="closeUpdate"
           >Close <v-icon>close</v-icon></v-btn
         >
       </div>
@@ -206,6 +206,7 @@ export default {
       menu: false,
       newAvatar: null,
       errors: {},
+      loading: false,
     };
   },
   watch: {
@@ -250,6 +251,7 @@ export default {
       this.update = false;
     },
     updateUser() {
+      this.loading = true;
       axios
         .put("/api/user", this.chat)
         .then((response) => {
@@ -260,6 +262,9 @@ export default {
           if (errors.response.status == 422) {
             this.errors = errors.response.data.errors;
           }
+        })
+        .finally(() => {
+          this.loading = false;
         });
     },
     updateAvatar(e) {
@@ -330,7 +335,6 @@ export default {
   margin-left: 30%;
   margin-bottom: 10px;
   min-height: 50px;
-  
 }
 .name {
   color: white;

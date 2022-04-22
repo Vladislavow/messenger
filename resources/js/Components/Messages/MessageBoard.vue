@@ -83,8 +83,8 @@
 import MessageNav from "./MessageNav.vue";
 import MessageCreator from "./MessageCreator.vue";
 import MessageList from "./MessageList.vue";
-import Profile from "./Profile.vue";
-import AudioPlayer from "./AudioPlayer.vue";
+import Profile from "../Profile.vue";
+import AudioPlayer from "../MediaViewers/AudioPlayer.vue";
 export default {
   components: { MessageList, MessageCreator, Profile, MessageNav, AudioPlayer },
   data: () => {
@@ -115,6 +115,10 @@ export default {
       if (val) {
         this.getMessages();
         axios.post(`/api/chat/${val}/markasread`);
+      }
+      if (val == null) {
+        this.page = 1;
+        this.totalPages = 1;
       }
     },
   },

@@ -57,7 +57,7 @@
         <template v-if="updateMessage != null" v-slot:prepend>
           <v-icon @click="closeUpdate"> mdi-pencil-remove </v-icon>
         </template>
-        <template v-slot:append>
+        <template class="paperclip" v-slot:append>
           <v-icon
             :disabled="
               attachment.length +
@@ -367,5 +367,8 @@ textarea * {
     background-position: left 15px top, right 15px bottom, left bottom 15px,
       right top 15px;
   }
+}
+.mdi-paperclip:hover {
+  transform: scale(1.5);
 }
 </style>
