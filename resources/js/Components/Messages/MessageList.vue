@@ -260,6 +260,7 @@ export default {
   -webkit-user-select: none;
   user-select: none;
   transition: 0.5s;
+  z-index: 99;
 }
 @media (max-width: 700px) {
   .messages {
