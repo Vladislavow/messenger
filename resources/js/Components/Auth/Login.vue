@@ -1,42 +1,52 @@
 <template>
-  <div class="back">
     <div class="login">
-      <v-text-field
-        dark
-        v-model="user.email"
-        prepend-inner-icon="mdi-email"
-        label="Email"
-        :error="this.errors != null && this.errors.email != null"
-        :error-messages="this.errors.email"
-        readonly
-        onfocus="this.removeAttribute('readonly')"
-        @keyup.enter.prevent="$refs.password.focus()"
-      />
-      <v-text-field
-        dark
-        label="Password"
-        v-model="user.password"
-        prepend-inner-icon="mdi-lock"
-        :error="this.errors != null && this.errors.password != null"
-        :type="show ? 'text' : 'password'"
-        :error-messages="this.errors.password"
-        :append-icon="this.show ? 'mdi-eye' : 'mdi-eye-off'"
-        @click:append="show = !show"
-        readonly
-        onfocus="this.removeAttribute('readonly')"
-        @keypress.enter="login"
-        ref="password"
-      />
-
-      <v-btn dark @click.prevent="login" :loading="loading"> Enter</v-btn>
-      <router-link to="/register">
-        <v-btn> Sign up</v-btn>
-      </router-link>
-      <router-link class="forgot" to="/forgot-password">
-        <v-btn plain color="red"> Forgot password?</v-btn>
-      </router-link>
+        <div class="image-container">
+            <img src="/images/login.svg" alt="Login" />
+        </div>
+        <div class="login-container">
+            <div class="login-form">
+                <div class="input-container">
+                    <h2>Sign in</h2>
+                    <br />
+                    <v-text-field
+                        v-model="user.email"
+                        placeholder="Email"
+                        solo
+                        prepend-inner-icon="mdi-email"
+                        :error="
+                            this.errors != null && this.errors.email != null
+                        "
+                        :error-messages="this.errors.email"
+                    ></v-text-field>
+                    <v-text-field
+                        :type="show ? 'text' : 'password'"
+                        v-model="user.password"
+                        solo
+                        hide-details=""
+                        placeholder="Password"
+                        prepend-inner-icon="mdi-lock"
+                        :append-icon="show ? 'mdi-eye-off' : 'mdi-eye'"
+                        @click:append="show = !show"
+                        :error="
+                            this.errors != null && this.errors.password != null
+                        "
+                        @keypress.enter="login"
+                        :error-messages="this.errors.password"
+                    ></v-text-field>
+                    <div class="forgot-passowrd-link">
+                        <router-link to="/forgot-password"
+                        ><u>Forgot Password</u></router-link
+                        >
+                    </div>
+                </div>
+                <v-btn @click="login" :loading="loading" block color="primary"> Login</v-btn>
+                <div class="sign-up">
+                    Dont have an account?
+                     <router-link to="/register">Sign up now</router-link>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -99,42 +109,61 @@ export default {
 
 <style lang="scss" scoped>
 .login {
-  width: 40%;
-  position: fixed;
-  border-radius: 10%;
-  padding: 15px;
-  text-align: center;
-  min-width: 300px;
-  min-height: 200px;
-  max-height: 200px;
-  background: rgba(240, 240, 240, 0.14);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(6.1px);
-  -webkit-backdrop-filter: blur(6.1px);
-  border: 1px solid rgba(255, 255, 255, 0.41);
-  @media (max-width:1500px) {
-    max-height: 230px;
-  }
-}
-.back {
-  background-image: url("https://blog.1a23.com/wp-content/uploads/sites/2/2020/02/Desktop.png");
-  background-size: cover;
-  background-color: rgb(33, 33, 33);
-  background-attachment: fixed;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.forgot {
-  position: absolute;
-  text-align: right;
-  right: 0px;
-  @media (max-width: 1500px) {
-    position: initial;
-  }
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    background: rgb(248, 250, 251);
+    .image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        img {
+            max-height: 70%;
+        }
+        width: 60%;
+        height: 100%;
+    }
+    .login-container {
+        display: flex;
+        align-items: center;
+        width: 40%;
+        height: 100%;
+        opacity: 0.8;
+
+        .login-form {
+            // box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(6.1px);
+            -webkit-backdrop-filter: blur(6.1px);
+            align-self: center;
+            width: 80%;
+            padding: 20px;
+            text-align: center;
+            @media (max-width: 1000px) {
+                width: auto;
+            }
+            .forgot-passowrd-link {
+                text-align: right;
+                margin: 10px 0px;
+            }
+        }
+        .sign-up {
+            margin: 15px 0px;
+            opacity: 0.7;
+        }
+    }
+    @media screen and (max-width: 1000px) {
+        flex-direction: column;
+        .image-container {
+            max-height: 250px;
+            width: 100%;
+        }
+        .login-container {
+            width: 100%;
+            height: unset !important;
+            .login-form {
+                width: 100%;
+            }
+        }
+    }
 }
 </style>

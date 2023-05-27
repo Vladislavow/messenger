@@ -1,4 +1,3 @@
-
 import App from './Components/App.vue'
 import Login from './Components/Auth/Login.vue'
 import Register from './Components/Auth/Register'
@@ -48,6 +47,5 @@ export default {
             path: '*',
             redirect: '/404',
         },
-
     ]
 }

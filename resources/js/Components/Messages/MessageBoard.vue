@@ -99,7 +99,7 @@ export default {
       withFiles: false,
       online: [],
       dialog: false,
-      deleteableMessage: null,
+      deletableMessage: null,
       typingTimeOut: null,
     };
   },
@@ -114,7 +114,7 @@ export default {
     chat: function (val) {
       if (val) {
         this.getMessages();
-        axios.post(`/api/chat/${val}/markasread`);
+        axios.post(`/api/chats/${val}/mark-as-read`);
       }
       if (val == null) {
         this.page = 1;
@@ -187,7 +187,7 @@ export default {
       this.$store.dispatch("selectChat", this.chat.id);
     },
     showDeleteDialog(message) {
-      this.deleteableMessage = message;
+      this.deletableMessage = message;
       this.dialog = true;
     },
     changeWithFiles(value) {
@@ -211,7 +211,7 @@ export default {
       });
       axios
         .post(
-          "/api/message/" + this.$store.getters.updateMessage.id,
+          "/api/messages/" + this.$store.getters.updateMessage.id,
           formData,
           config
         )
@@ -231,15 +231,15 @@ export default {
     deleteMessage() {
       this.dialog = false;
       axios
-        .delete("/api/message/" + this.deleteableMessage.id)
+        .delete("/api/messages/" + this.deletableMessage.id)
         .then((response) => {
           let id = this.messages.indexOf(
             this.messages.find(
-              (messagef) => messagef.id == this.deleteableMessage.id
+              (messagef) => messagef.id == this.deletableMessage.id
             )
           );
           this.messages.splice(id, 1);
-          this.deleteableMessage = null;
+          this.deletableMessage = null;
           let lastmessage = this.messages[this.messages.length - 1];
           this.$store.dispatch("setLastMessage", {
             sender: this.chat,
@@ -281,7 +281,7 @@ export default {
       this.CancelToken = axios.CancelToken;
       this.source = this.CancelToken.source();
       axios
-        .get(`/api/chat/${this.chat}/messages?page=${this.page}`, {
+        .get(`/api/chats/${this.chat}/messages?page=${this.page}`, {
           cancelToken: this.source.token,
         })
         .then((resp) => {
@@ -299,7 +299,7 @@ export default {
       if (this.chat == message.sender) {
         this.messages.push(message);
         this.setRead();
-        axios.post(`/api/chat/${message.sender}/markasread`);
+        axios.post(`/api/chats/${message.sender}/mark-as-read`);
         this.setLastMessage(message);
       } else {
         this.$toast.info("New message!", {});
@@ -416,7 +416,7 @@ export default {
 }
 
 .ms {
-  margin-left: 12.5%;
+  margin-left: 10%;
 }
 
 .closedProfile {

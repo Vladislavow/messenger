@@ -235,7 +235,7 @@ export default {
       });
     },
     getChat() {
-      axios.get("/api/chat/" + this.chatId).then((resp) => {
+      axios.get("/api/chats/" + this.chatId).then((resp) => {
         this.chat = resp.data;
       });
     },

@@ -14,13 +14,15 @@ class UserFactory extends Factory
      */
     public function definition()
     {
+        $email = $this->faker->unique()->safeEmail();
         return [
             'firstname' => $this->faker->firstname(),
             'lastname' => $this->faker->lastname(),
             'nickname' => $this->faker->firstname(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'email' => $email,
             'email_verified_at' => now(),
             'password' => '12345678',
+            'avatar' => $this->get_gravatar($email),
             'remember_token' => Str::random(10),
             'phone' => $this->faker->phoneNumber(),
         ];
@@ -38,5 +40,18 @@ class UserFactory extends Factory
                 'email_verified_at' => null,
             ];
         });
+    }
+
+    function get_gravatar( $email, $s = 80, $d = 'wavatar', $r = 'g', $img = false, $atts = array() ) {
+        $url = 'https://www.gravatar.com/avatar/';
+        $url .= md5( strtolower( trim( $email ) ) );
+        $url .= "?s=$s&d=$d&r=$r";
+        if ( $img ) {
+            $url = '<img src="' . $url . '"';
+            foreach ( $atts as $key => $val )
+                $url .= ' ' . $key . '="' . $val . '"';
+            $url .= ' />';
+        }
+        return $url;
     }
 }

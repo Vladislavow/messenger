@@ -1,35 +1,45 @@
 <template>
-  <div class="forgot">
-    <div class="reset-container">
-      <div v-if="!sent" class="form">
-        <div class="information">Forgot password?</div>
-        <p class="add-text">Enter your email for reset password</p>
-        <div class="inputs">
-          <v-text-field
-            v-model="email"
-            prepend-inner-icon="mdi-email"
-            dark
-            label="Email"
-            :error="this.errors != null && this.errors.email != null"
-            :error-messages="this.errors.email"
-          >
-          </v-text-field>
-          <v-btn :loading="loading" @click.prevent="sendResetMail"
-            >Send mail</v-btn
-          >
-          <router-link to="/login">
-            <v-btn>Log in</v-btn>
-          </router-link>
+    <div class="forgot-password">
+        <div class="image-container">
+            <img src="/images/forgot-password.svg" alt="Login"/>
         </div>
-      </div>
-      <div v-if="sent" class="sent">
-        <div>We have emailed your password reset link!</div>
-        <router-link to="/login">
-          <v-btn>Log in</v-btn>
-        </router-link>
-      </div>
+        <div class="fp-container">
+            <div class="fp-form" v-if="!sent">
+                <h2>Forgot your password?</h2>
+                <h4 style="text-align: left; margin-top: 10px">
+                    Enter your email for recovery
+                </h4>
+                <br/>
+                <v-text-field
+                    v-model="email"
+                    placeholder="Email"
+                    solo
+                    prepend-inner-icon="mdi-email"
+                    readonly
+                    onfocus="this.removeAttribute('readonly')"
+                    :error="this.errors != null && this.errors.email != null"
+                    :error-messages="this.errors.email"
+                ></v-text-field>
+                <v-btn
+                    @click="resetPassword"
+                    block
+                    color="primary"
+                    :loading="loading"
+                >Send reset link
+                </v-btn
+                >
+                <div class="sign-in">
+                    Back to
+                    <router-link to="/login">sign in</router-link>
+                </div>
+            </div>
+            <div class="fp-form" v-if="sent">
+                <h2>Link has been sent to your email</h2>
+                <router-link to="/login">Back to sign in</router-link>
+                <br/>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -43,7 +53,7 @@ export default {
     };
   },
   methods: {
-    sendResetMail() {
+      resetPassword() {
       this.errors = {};
       this.loading = true;
       axios
@@ -66,61 +76,70 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.forgot {
-  height: 100%;
-  width: 100%;
-  background: rgb(58, 56, 83);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-image: url("https://blog.1a23.com/wp-content/uploads/sites/2/2020/02/pattern-7.svg");
-}
+.forgot-password {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    background: rgb(248, 250, 251);
 
-.form {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  flex-direction: column;
-}
-.reset-container {
-  font-size: 23px;
-  color: white;
-  height: 230px;
-  width: 33%;
-  min-width: 200px;
-  background: rgba(240, 240, 240, 0.33);
-  border-radius: 35px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(6.1px);
-  -webkit-backdrop-filter: blur(6.1px);
-  border: 1px solid rgba(255, 255, 255, 0.99);
-  @media (max-width: 1000px) {
-    width: 75%;
-    height: 230px;
-  }
-  @media (max-width: 400px) {
-    width: 80%;
-    height: 230px;
-  }
-}
-.add-text {
-  align-self: flex-start !important;
-  font-size: 18px;
-  margin-bottom: 0px;
-}
-.sent {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  height: 100%;
-  font-size: 28px;
-}
-.inputs {
-  width: 100%;
-  text-align: center;
-  .v-btn {
-    margin-top: 15px;
-  }
+    .image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        img {
+            max-height: 70%;
+        }
+
+        width: 60%;
+        height: 100%;
+    }
+
+    .fp-container {
+        display: flex;
+        align-items: center;
+        width: 40%;
+        height: 100%;
+        opacity: 0.8;
+
+        .fp-form {
+            // box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(6.1px);
+            -webkit-backdrop-filter: blur(6.1px);
+            align-self: center;
+            width: 80%;
+            padding: 20px;
+            text-align: center;
+            @media (max-width: 1000px) {
+                width: auto;
+            }
+
+            .forgot-passowrd-link {
+                text-align: right;
+                margin: 10px 0px;
+            }
+        }
+
+        .sign-in {
+            margin: 15px 0px;
+            opacity: 0.7;
+        }
+    }
+
+    @media screen and (max-width: 1000px) {
+        flex-direction: column;
+        .image-container {
+            max-height: 250px;
+            width: 100%;
+        }
+        .fp-container {
+            width: 100%;
+            height: unset !important;
+
+            .fp-form {
+                width: 100%;
+            }
+        }
+    }
 }
 </style>

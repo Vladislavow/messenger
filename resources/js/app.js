@@ -65,9 +65,9 @@ Axios.interceptors.response.use(
                 localStorage.removeItem("userid");
                 location.reload();
             } else if (error.response.status == 422) {
-                Vue.$toast.error("Unprocessible content");
+                Vue.$toast.error("Unprocessable content");
             } else {
-                Vue.$toast.error(error.response.data);
+                Vue.$toast.error(error.response.statusText);
             }
             return Promise.reject(error);
         }

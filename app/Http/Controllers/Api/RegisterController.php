@@ -16,6 +16,7 @@ class RegisterController extends Controller
         $avatar = $request->avatar->store('/', 'public');
         $user->update(['avatar' => $avatar]);
         $token = $user->createToken($user->email)->plainTextToken;
+
         return response()->json([
             'user' => $user,
             'token' => $token

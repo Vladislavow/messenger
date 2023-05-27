@@ -19,10 +19,13 @@ class LoginController extends Controller
     {
         $validatedFields = $request->validated();
         $user = User::where('email', $validatedFields['email'])->first();
+
         if (!$user || !Hash::check($validatedFields['password'], $user->password)) {
             return response()->json('Invalid credentials', 404);
         }
+
         $token = $user->createToken($request->browser)->plainTextToken;
+
         return response()->json([
             'token' => $token,
             'user' => $user
@@ -34,9 +37,13 @@ class LoginController extends Controller
         if (auth()->check()) {
             /** @var User $user  */
             $user =  auth()->user();
+
             $user->online = false;
             $user->last_seen = Carbon::now();
             $user->currentAccessToken()->delete();
+            $user->save();
+
+
             return response()->json('Logged out', 200);
         } else {
             return redirect('/login');

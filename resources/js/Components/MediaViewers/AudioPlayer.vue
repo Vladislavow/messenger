@@ -23,7 +23,7 @@
         @change="setProgress"
         thumb-label
         @mousedown="player.pause()"
-        @mouseup="player.play()"        
+        @mouseup="player.play()"
       >
         <template v-slot:thumb-label="{ value }">
           {{ parseTime(value) }}
@@ -151,7 +151,7 @@ export default {
     },
     getFile(value) {
       axios
-        .get("/api/attachment/" + value, { responseType: "blob" })
+        .get(`/api/attachments/${value}/stream`, { responseType: "blob" })
         .then((response) => {
           let url = URL.createObjectURL(response.data);
           this.player.src = url;

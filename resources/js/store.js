@@ -251,14 +251,14 @@ export default new Vuex.Store({
         },
         checkForChatExists({ commit }, message) {
             return new Promise((resolve, reject) => {
-                axios.get("/api/chat/" + message.sender).then((response) => {
+                axios.get("/api/chats/" + message.sender).then((response) => {
                     commit("check_exists", response.data);
                     resolve();
                 });
             });
         },
         updateChat({ commit }, chat) {
-            axios.get("/api/chat/" + chat.id).then((response) => {
+            axios.get("/api/chats/" + chat.id).then((response) => {
                 commit("update_chat", response.data);
             });
         },
@@ -266,7 +266,7 @@ export default new Vuex.Store({
             commit("set_last_message_as_read", chat);
         },
         changeOnlineStatus({ commit }, data) {
-            axios.get('/api/chat/' + data.id).then(resp => {
+            axios.get('/api/chats/' + data.id).then(resp => {
                 data.last_seen = resp.data.last_seen;
                 commit("set_status", data);
             });
@@ -307,13 +307,11 @@ export default new Vuex.Store({
         selectedImage: (state) => state.selectedImage,
         selectedTheme: (state) => state.selectedTheme,
         typingStatus: (state) =>
-            // if (state.selectedChat) {
             state.chats[
                 state.chats.indexOf(
                     state.chats.find((chat) => chat.id == state.selectedChat)
                 )
             ].typing
-        // }
         ,
     },
 });

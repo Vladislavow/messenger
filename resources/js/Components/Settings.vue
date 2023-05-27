@@ -110,7 +110,7 @@ export default {
     },
     closeSession() {
       axios
-        .delete("/api/session/" + this.selectedForClose)
+        .delete("/api/sessions/" + this.selectedForClose)
         .then((resp) => {
           this.$toast.success(resp.data);
           this.getActiveSessions();
@@ -131,7 +131,7 @@ export default {
       });
     },
     getCurrentSession() {
-      axios.get("/api/current_token_id").then((resp) => {
+      axios.get("/api/sessions/current").then((resp) => {
         this.currentSessionId = resp.data;
       });
     },

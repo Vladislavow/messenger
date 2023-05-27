@@ -2,140 +2,67 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Events\HasRead;
-use App\Events\MessageDeleted;
-use App\Events\MessageUpdated;
-use App\Events\NewMessage;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
 use App\Http\Requests\StoreMessageRequest;
 use App\Http\Requests\UpdateMessageRequest;
-use App\Models\Attachment;
-use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use App\Models\User;
+use App\Services\MessageService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class MessageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(int $id)
+    const DEFAULT_MESSAGES_PAGINATION = 40;
+    public function __construct(private readonly MessageService $messageService)
+    {
+    }
+
+    public function index(Request $request, int $chatId): JsonResponse
     {
         /** @var User $user */
         $user = auth()->user();
-        Message::where(function ($query) use ($id, $user) {
-            $query->where('sender', $id);
-            $query->where('recipient', $user->id);
-        })->where('read', false)->update(['read' => true]);
-        $messages = Message::with('attachments')->where(function ($query) use ($id, $user) {
-            $query->where('sender', $user->id);
-            $query->where('recipient', $id);
-        })->orWhere(function ($query) use ($id, $user) {
-            $query->where('recipient', $user->id);
-            $query->where('sender', $id);
-        })->orderBy('id', 'desc')->paginate(40);
-        return response()->json($messages);
+
+        $this->messageService->markAsRead($user, $chatId);
+
+        return response()->json($this->messageService->getChatMessages($user, $chatId)
+            ->orderBy('id', 'desc')
+            ->paginate(self::DEFAULT_MESSAGES_PAGINATION));
     }
 
-    public function markAsRead($id)
+    public function markAsRead(Request $request, $chatId): Response
     {
         /** @var User $user */
         $user = auth()->user();
-        Message::where(function ($query) use ($id, $user) {
-            $query->where('sender', $id);
-            $query->where('recipient', $user->id);
-        })->where('read', false)->update(['read' => true]);
-        broadcast(new HasRead($id));
+
+        $this->messageService->markAsRead($user, $chatId);
+
+        return response()->noContent();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreMessageRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreMessageRequest $request)
+    public function store(StoreMessageRequest $request): JsonResponse
     {
         $validatedFields = $request->validated();
-        $message = Message::create($validatedFields);
-        $message->read = false;
-        $this->storeAttachment($request->attachment, $message);
-        $message = Message::with('attachments')->find($message->id);
-        broadcast(new NewMessage($message));
+
+        $newMessage = $this->messageService->store($validatedFields, $request->attachment);
+
+        return response()->json($newMessage);
+    }
+
+    public function update(UpdateMessageRequest  $request, Message $message): JsonResponse
+    {
+        $validatedFields = $request->validated();
+
+        $this->messageService->update($message, $validatedFields, $request->attachment);
+
         return response()->json($message);
     }
 
-    public function storeAttachment($files, $message)
+    public function destroy(Request $request, Message $message): JsonResponse
     {
-        if ($files && count($files) > 0) {
-            foreach ($files as $file) {
-                $attachment = new Attachment();
-                $attachment->message_id = $message->id;
-                $attachment->original_name = $file->getClientOriginalName();
-                $attachment->path = 'storage/' . $file->store('/attachment', 'public');
-                $attachment->extension = pathinfo($attachment->path, PATHINFO_EXTENSION);
-                $attachment->save();
-            }
-        }
-    }
+        $this->messageService->destroy($message);
 
-    public function update(UpdateMessageRequest  $request, Message $message)
-    {
-        $validatedFields = $request->validated();
-        $message->update($validatedFields);
-        $this->storeAttachment($request->attachment, $message);
-        $message = Message::with('attachments')->find($message->id);
-        broadcast(new MessageUpdated($message));
-        return response()->json($message);
-    }
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Message  $message
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Message $message)
-    {
-        $message->delete();
-        broadcast(new MessageDeleted($message));
         return response()->json('deleted', 200);
-    }
-
-    public function getAttachment(Attachment $attachment)
-    {
-        $message = $attachment->message;
-        /** @var User $user */
-        $user = auth()->user();
-        if ($user->id == $message->sender || $user->id == $message->recepient) {
-            $response = new BinaryFileResponse($attachment->path);
-            BinaryFileResponse::trustXSendfileTypeHeader();
-            return $response;
-        }
-        return response()->json('Forbidden', 403);
-    }
-
-    public function downloadAttachment(Attachment $attachment)
-    {
-        /** @var User $user */
-        $user = auth()->user();
-        $message = Message::find($attachment->message_id);
-        if ($user->id == $message->sender || $user->id == $message->recipient) {
-            return response()->download($attachment->path);
-        } else {
-            return response()->json('Access denied', 503);
-        }
-    }
-
-    public function deleteAttachment(Attachment $attachment)
-    {
-        $message_id = $attachment->message->id;
-        if (Storage::exists($attachment->path)) {
-            Storage::delete($attachment->path);
-        }
-        $attachment->delete();
-        broadcast(new MessageUpdated(Message::with('attachments')->where('id', $message_id)->first()));
-        return response()->json('Attechament deleted', 200);
     }
 }

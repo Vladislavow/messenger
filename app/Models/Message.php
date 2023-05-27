@@ -6,6 +6,7 @@ use Attribute;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Message extends Model
 {
@@ -15,6 +16,7 @@ class Message extends Model
         'sender',
         'recipient',
         'content',
+        'read'
     ];
 
     protected $casts = [
@@ -26,7 +28,7 @@ class Message extends Model
         return Carbon::parse($value)->timezone('Europe/Kiev')->toDateTimeString();
     }
 
-    public function attachments()
+    public function attachments(): HasMany
     {
         return $this->hasMany(Attachment::class, 'message_id', 'id');
     }

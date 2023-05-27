@@ -13,31 +13,35 @@ use App\Http\Requests\ResetPasswordRequest;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 
 class UserController extends Controller
 {
-    public function updateUser(UpdateUserRequest $request)
+    public function update(UpdateUserRequest $request)
     {
         /** @var User $user */
         $user = auth()->user();
         $validatedFields = $request->validated();
+
         $user->update($validatedFields);
         $user->save();
+
         (new SendAllContacts(ChatUpdated::class, $user))->handle();
+
         return response()->json('Profile updated', 200);
     }
 
-    public function updateAvatar(UpdateUserAvatarRequest $request)
+    public function setAvatar(UpdateUserAvatarRequest $request)
     {
         /** @var User $user */
         $user = auth()->user();
         $validatedFields = $request->validated();
+
         $user->avatar =  $request->avatar->store('/avatars', 'public');
         $user->save();
+
         (new SendAllContacts(ChatUpdated::class, $user))->handle();
+
         return response()->json('Avatar updated', 200);
     }
 
@@ -45,10 +49,12 @@ class UserController extends Controller
     {
         /** @var User $user */
         $user = auth()->user();
-        $validatedfields = $request->validated();
-        $user->online = $validatedfields['status'];
-        $user->last_seen = $validatedfields['status'] == true ? $user->last_seen : Carbon::now();
+        $validatedFields = $request->validated();
+
+        $user->online = $validatedFields['status'];
+        $user->last_seen = $validatedFields['status'] ? $user->last_seen : Carbon::now();
         $user->save();
+
         return response()->json('Status changed', 200);
     }
 

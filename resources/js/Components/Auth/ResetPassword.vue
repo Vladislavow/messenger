@@ -1,61 +1,79 @@
 <template>
-  <div class="forgot">
-    <div class="reset-container">
-      <div class="form">
-        <div class="information">Reset password</div>
-        <p class="add-text">Enter new password:</p>
-        <div class="inputs">
-          <v-text-field
-            v-model="password"
-            prepend-inner-icon="mdi-lock"
-            dark
-            :type="show ? 'text' : 'password'"
-            label="Password"
-            :error="this.errors != null && this.errors.password != null"
-            :error-messages="this.errors.password"
-            :append-icon="show ? 'mdi-eye-off':'mdi-eye'"
-            @click:append="show = !show"
-          />
-          <v-text-field
-            v-model="confirm_password"
-            prepend-inner-icon="mdi-lock"
-            dark
-            label="Confirm password"
-            :error="this.errors != null && this.errors.confirm_password != null"
-            :error-messages="this.errors.confirm_password"
-            :append-icon="show1 ? 'mdi-eye-off':'mdi-eye'"
-            @click:append="show1 = !show1"
-            :type="show1 ? 'text' : 'password'"
-          />
-          <v-btn :loading="loading" @click="resetPassword">Save password</v-btn>
+    <div class="reset-password">
+        <div class="image-container">
+            <img src="/images/reset-password.svg" alt="reset-password"/>
         </div>
-      </div>
+        <div class="rp-container">
+            <div class="rp-form">
+                <h2>Reset password</h2>
+                <br/>
+                <v-text-field
+                    label="New password"
+                    v-model="resetForm.password"
+                    solo
+                    :append-icon="show.password ? 'mdi-eye-off' : 'mdi-eye'"
+                    @click:append="show.password = !show.password"
+                    :error="this.errors != null && this.errors.password != null"
+                    :error-messages="this.errors.password"
+                    :type="show.password ? 'text' : 'password'"
+                ></v-text-field>
+                <v-text-field
+                    label="Password confirmation"
+                    v-model="resetForm.password_confirmation"
+                    solo
+                    :append-icon="
+                        show.password_confirmation ? 'mdi-eye-off' : 'mdi-eye'
+                    "
+                    @click:append="
+                        show.password_confirmation = !show.password_confirmation
+                    "
+                    :type="show.password_confirmation ? 'text' : 'password'"
+                    :error="
+                        this.errors != null &&
+                        this.errors.password_confirmation != null
+                    "
+                    :error-messages="this.errors.password_confirmation"
+                ></v-text-field>
+                <v-btn
+                    @click="resetPassword"
+                    :loading="loading"
+                    block
+                    color="primary"
+                >
+                    Reset password
+                </v-btn
+                >
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
 export default {
   data: () => {
     return {
-      token: null,
-      password: null,
-      email: null,
-      confirm_password: null,
-      loading: false,
-      errors: {},
-      show:false,
-      show1:false,
+        resetForm: {
+            token: null,
+            email: null,
+            password: null,
+            password_confirmation: null,
+        },
+        show: {
+            password: false,
+            password_confirmation: false,
+        },
+        loading: false,
+        errors: {},
     };
   },
   mounted() {
     if (this.$route.query.token) {
-      this.token = this.$route.query.token;
+      this.resetForm.token = this.$route.query.token;
     } else {
       this.$router.push("/login");
     }
     if (this.$route.query.email) {
-      this.email = this.$route.query.email;
+      this.resetForm.email = this.$route.query.email;
     } else {
       this.$router.push("/login");
     }
@@ -63,16 +81,11 @@ export default {
   methods: {
     resetPassword() {
       this.errors = {};
-      if (this.password && this.confirm_password) {
-        if (this.password == this.confirm_password) {
+      if (this.resetForm.password && this.resetForm.password_confirmation) {
+        if (this.resetForm.password == this.resetForm.password_confirmation) {
           this.loading = true;
           axios
-            .post("/api/reset-password", {
-              email: this.email,
-              token: this.token,
-              password: this.password,
-              password_confirmation: this.confirm_password,
-            })
+            .post("/api/reset-password", this.resetForm)
             .then((resp) => {
               this.$toast.success(resp.data);
               this.$router.push("/login");
@@ -85,14 +98,14 @@ export default {
               this.loading = false;
             });
         } else {
-          this.errors.confirm_password = "Password don't match";
+          this.errors.password_confirmation = "Passwords doesn't match";
         }
       } else {
         if (!this.password) {
           this.errors.password = "Password required";
         }
-        if (!this.confirm_password) {
-          this.errors.confirm_password = "Password confirm required";
+        if (!this.password_confirmation) {
+          this.errors.password_confirmation = "Password confirm required";
         }
       }
     },
@@ -101,51 +114,67 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.forgot {
-  height: 100%;
-  width: 100%;
-  background: rgb(109, 94, 94);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-image: url('https://blog.1a23.com/wp-content/uploads/sites/2/2020/02/pattern-33.svg');
-}
+.reset-password {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    background: rgb(248, 250, 251);
 
-.form {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  flex-direction: column;
-}
-.reset-container {
-  font-size: 23px;
-  color: white;
-  width: 33%;
-  min-width: 200px;
-  background: rgba(240, 240, 240, 0.14);
-  border-radius: 35px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(6.1px);
-  -webkit-backdrop-filter: blur(6.1px);
-  border: 1px solid rgba(255, 255, 255, 1);
-}
-.add-text {
-  align-self: flex-start !important;
-  font-size: 18px;
-  margin-bottom: 0px;
-}
-.sent {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  font-size: 28px;
-}
-.inputs {
-  width: 100%;
-  text-align: center;
-  .v-btn {
-    margin-top: 15px;
-  }
+    .image-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        img {
+            max-height: 70%;
+        }
+
+        width: 60%;
+        height: 100%;
+    }
+
+    .rp-container {
+        display: flex;
+        align-items: center;
+        width: 40%;
+        height: 100%;
+        opacity: 0.8;
+
+        .rp-form {
+            align-self: center;
+            width: 80%;
+            padding: 20px;
+            text-align: center;
+            @media (max-width: 1000px) {
+                width: auto;
+            }
+
+            .forgot-passowrd-link {
+                text-align: right;
+                margin: 10px 0px;
+            }
+        }
+
+        .sign-up {
+            margin: 15px 0px;
+            opacity: 0.7;
+        }
+    }
+
+    @media screen and (max-width: 1000px) {
+        flex-direction: column;
+        .image-container {
+            max-height: 250px;
+            width: 100%;
+        }
+        .rp-container {
+            width: 100%;
+            height: unset !important;
+
+            .rp-form {
+                width: 100%;
+            }
+        }
+    }
 }
 </style>

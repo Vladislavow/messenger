@@ -7,7 +7,7 @@
     @contextmenu.prevent="show"
   >
     <div class="content">
-      <div v-if="message.attachments.length > 0">
+      <div v-if="message.attachments && message.attachments.length > 0">
         <div v-for="(file, index) in message.attachments" :key="index">
           <div class="player" v-if="audioExtensions.includes(file.extension)">
             <v-btn dark depressed fab x-small @click="selectAudio(file)">
@@ -135,7 +135,7 @@ export default {
   mounted() {},
   methods: {
     hasLink() {
-      var expression =
+      const expression =
         "((?:(http|https|Http|Https|rtsp|Rtsp|ftp):\\/\\/(?:(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)" +
         "\\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,64}(?:\\:(?:[a-zA-Z0-9\\$\\-\\_" +
         "\\.\\+\\!\\*\\'\\(\\)\\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,25})?\\@)?)?" +
@@ -175,7 +175,7 @@ export default {
         "(\\/(?:(?:[a-zA-Z0-9\\;\\/\\?\\:\\@\\&\\=\\#\\~" +
         "\\-\\.\\+\\!\\*\\'\\(\\)\\,\\_])|(?:\\%[a-fA-F0-9]{2}))*)?" +
         "(?:\\b|$)";
-      var regex = new RegExp(expression);
+      const regex = new RegExp(expression);
       if (this.message.content) {
         return this.message.content.match(expression) != null;
       } else {
@@ -184,9 +184,9 @@ export default {
     },
     handleLinks() {
       let arr = [];
-      var expression =
+      const expression =
         /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~@:%]*)*(#[\w\-]*)?(\?[^\s]*)?/gi;
-      var regex = new RegExp(expression);
+      const regex = new RegExp(expression);
       if (this.message.content) {
         let links = this.message.content.match(expression);
         if (links && links.length > 0) {
@@ -261,12 +261,12 @@ export default {
     download(file) {
       this.loading = true;
       axios
-        .get("/api/download/" + file.id, {
+        .get(`/api/attachments/${file.id}/download`, {
           responseType: "blob",
         })
         .then((response) => {
-          var fileURL = window.URL.createObjectURL(new Blob([response.data]));
-          var fileLink = document.createElement("a");
+          const fileURL = window.URL.createObjectURL(new Blob([response.data]));
+          const fileLink = document.createElement("a");
           fileLink.href = fileURL;
           fileLink.setAttribute("download", `${file.original_name}`);
           document.body.appendChild(fileLink);

@@ -15,6 +15,7 @@ class SendAllContacts implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected ChatService $chatService;
     protected string $event;
     protected $param;
     /**
@@ -24,6 +25,7 @@ class SendAllContacts implements ShouldQueue
      */
     public function __construct(string $event, $param)
     {
+        $this->chatService = app()->make(ChatService::class);
         $this->event = $event;
         $this->param = $param;
     }
@@ -35,7 +37,8 @@ class SendAllContacts implements ShouldQueue
      */
     public function handle()
     {
-        $idsArray = ChatService::getChatIds();
+        $user = auth()->user();
+        $idsArray = $this->chatService->getChatIds($user);
         foreach ($idsArray as $id) {
             broadcast(new $this->event($this->param, $id));
         }
